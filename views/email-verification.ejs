@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="<%- __('lang') %>">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="/public/images/linkhub-icon.png"
+      type="image/x-icon"
+    />
+    <title><%= __('email_verification') %> | Link234</title>
+    <link rel="stylesheet" href="/public/style/theme.css" />
+  </head>
+  <body>
+    <main>
+      <div class="auth-wrapper">
+        <div class="auth">
+          <div class="logo">
+            <!-- <img src="/public/images/linkhub-icon.svg" alt="icon" /> -->
+            <img src="/public/images/logo-f1.svg" alt="Logo" />
+          </div>
+          <div class="max-500">
+            <img
+              class="ver-icon"
+              src="/public/images/icons/verified.svg"
+              alt="verified"
+            />
+            <div class="title green txt-center">
+              <%= __('email_verified') %>
+            </div>
+            <div class="sub mb-3 txt-center">
+              <%= __('email_success_verified') %>
+            </div>
+
+            <button
+              type="button"
+              id="loginButton"
+              class="butn butn-primary mb-3 w-100"
+            >
+              <%= __('login') %>
+            </button>
+          </div>
+        </div>
+        <div class="bg">
+          <img src="/public/images/authLoginBg.webp" alt="authBg" />
+        </div>
+      </div>
+    </main>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"
+      integrity="sha512-DdX/YwF5e41Ok+AI81HI8f5/5UsoxCVT9GKYZRIzpLxb8Twz4ZwPPX+jQMwMhNQ9b5+zDEefc+dcvQoPWGNZ3g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="/public/js/languageSwitcher.js"></script>
+    <script src="/public/js/config.js"></script>
+    <script>
+      const API_URL = apiBaseUrl;
+      document.addEventListener("DOMContentLoaded", function () {
+        const loginButton = document.getElementById("loginButton");
+        const titleDiv = document.querySelector(".title");
+        const subDiv = document.querySelector(".sub");
+        const iconImg = document.querySelector(".ver-icon");
+        let countdownDiv;
+        let countdownInterval;
+
+        // Function to get the token from the URL
+        function getTokenFromUrl() {
+          const urlParams = new URLSearchParams(window.location.search);
+          return urlParams.get("token");
+        }
+
+        // Function to show verification success
+        function showSuccess() {
+          titleDiv.classList.add("green");
+          titleDiv.classList.remove("red");
+          titleDiv.innerHTML = "<%= __('email_verified') %>";
+          subDiv.innerHTML = "<%= __('email_success_verified') %>";
+          iconImg.src = "/public/images/icons/verified.svg";
+          iconImg.alt = "verified";
+
+          // Start the countdown automatically after success
+          startCountdown();
+        }
+
+        // Function to show verification failure
+        function showFailure() {
+          titleDiv.classList.add("red");
+          titleDiv.classList.remove("green");
+          titleDiv.innerHTML = "<%= __('email_not_verified') %>";
+          subDiv.innerHTML = "<%= __('email_failed_verification') %>";
+          iconImg.src = "/public/images/icons/not_verified.svg";
+          iconImg.alt = "not verified";
+        }
+
+        // Function to start the countdown and redirect after 5 seconds
+        function startCountdown() {
+          let countdown = 5;
+          countdownDiv = document.createElement("div");
+          countdownDiv.className = "title-sm";
+          document.querySelector(".max-500").appendChild(countdownDiv);
+
+          countdownInterval = setInterval(() => {
+            countdownDiv.textContent = `<%=__('redirect_5')%>`;
+            countdown -= 1;
+
+            if (countdown < 0) {
+              clearInterval(countdownInterval);
+              window.location.href = "/login"; // Redirect to login page
+            }
+          }, 1000);
+        }
+
+        // Redirect immediately if the login button is clicked
+        loginButton.addEventListener("click", function () {
+          clearInterval(countdownInterval); // Stop the countdown
+          window.location.href = "/login"; // Redirect immediately
+        });
+
+        // Mapping function for email verification errors
+        function translateEmailVerificationError(apiMessage) {
+          const translations = {
+            "Invalid token": "<%= __('invalid_token') %>",
+            "Invalid or expired token": "<%= __('invalid_or_expired_token') %>",
+          };
+          return (
+            translations[apiMessage] || "<%= __('email_verification_failed') %>"
+          );
+        }
+
+        // Verify email with the backend API
+        function verifyEmail(token) {
+          axios
+            .get(`${API_URL}/auth/verify-email?token=${token}`)
+            .then((response) => {
+              showSuccess(); // Show success message and start countdown
+              loginButton.style.display = "block"; // Show login button
+            })
+            .catch((error) => {
+              const apiMessage =
+                error.response && error.response.data.message
+                  ? error.response.data.message
+                  : null;
+              const localizedMessage =
+                translateEmailVerificationError(apiMessage);
+              showFailure(localizedMessage); // Show failure message with localized error text
+              loginButton.style.display = "none"; // Hide login button on failure
+            });
+        }
+
+        // On page load, get the token and verify it
+        const token = getTokenFromUrl();
+        if (token) {
+          verifyEmail(token);
+        } else {
+          showFailure(); // Show failure if no token is found
+        }
+      });
+    </script>
+  </body>
+</html>

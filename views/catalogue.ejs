@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="/public/images/linkhub-icon.png"
+      type="image/x-icon"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css"
+      rel="stylesheet"
+    />
+    <title><%-__('catelogue') %> | Link234</title>
+    <link rel="stylesheet" href="/public/style/theme.css" />
+  </head>
+  <body>
+    <%- include('partials/app-header') %>
+    <main>
+      <div class="layout" style="padding-bottom: 60px; padding-top: 65px">
+        <div class="dashboard-wrapper">
+          <div class="page-header">
+            <div class="title"><%= __('add_catalogue') %></div>
+          </div>
+          <div class="page-content">
+            <div>
+              <div class="profile-form" style="margin-bottom: 60px">
+                <div class="link-container">
+                  <div>
+                    <button
+                      data-toggle="modal"
+                      data-id="catalogueModal"
+                      class="butn butn-primary item_catalogue"
+                    >
+                      + <%= __('add_catalogue') %>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="link-wrapper">
+                <!-- Render additional links if they exist -->
+                <div>
+                  <div class="title-sm mb-3"><%= __('catalogues') %></div>
+                  <div>
+                    <% if (user && user.catelogue && user.catelogue.length > 0)
+                    { %> <% user.catelogue.forEach((catelogue) => { %>
+                    <div class="c-item">
+                      <div class="title"><%- catelogue.title %></div>
+                      <div class="desc"><%- catelogue.description %></div>
+                      <div class="view-file">
+                        <a
+                          class="butn butn-primary butn-sm sss"
+                          target="_blank"
+                          href="<%- staticBaseUrl%>/<%- catelogue.file %>"
+                          ><%= __('view_file') %></a
+                        >
+                        <button
+                          class="butn butn-delete butn-sm"
+                          data-id="<%- catelogue._id %>"
+                        >
+                          <%= __('delete') %>
+                        </button>
+                      </div>
+                    </div>
+                    <% }) %> <% } else { %>
+                    <p><%= __('no_catalogue') %></p>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <%- include('partials/app-footer') %>
+
+    <div class="modal_" id="catalogueModal">
+      <div class="modal_container">
+        <div class="header">
+          <div class="title"><%= __('add_catalogue') %></div>
+          <div class="close">
+            <img src="/public/images/icons/minus.svg" alt="minus" />
+          </div>
+        </div>
+        <div class="body">
+          <form id="catalogueForm">
+            <div class="mb-3">
+              <label for="title"><%= __('title') %></label>
+              <input type="text" id="title" placeholder="<%= __('title') %>" />
+            </div>
+            <div class="mb-3">
+              <label for="title"><%= __('description') %></label>
+              <div
+                id="description"
+                style="height: auto; min-height: 100px"
+              ></div>
+            </div>
+            <div class="mb-3">
+              <label for="file"><%= __('catalogue_valid') %></label>
+              <div class="custom-f-input" data-toggle="#file">
+                <div class="title"><%= __('choose_file') %></div>
+                <div class="remove">
+                  <img src="/public/images/icons/minus.svg" alt="minus" />
+                </div>
+              </div>
+              <input style="display: none" type="file" id="file" />
+            </div>
+            <div id="addFormAlert" class="form-alert success d-none">
+              <%= __('catalogue_success_saved') %>
+            </div>
+            <button class="butn butn-primary mb-3"><%= __('save') %></button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- javascript -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"
+      integrity="sha512-DdX/YwF5e41Ok+AI81HI8f5/5UsoxCVT9GKYZRIzpLxb8Twz4ZwPPX+jQMwMhNQ9b5+zDEefc+dcvQoPWGNZ3g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4ijUxSISsbNS29gjv8onur04fqQ8zets&libraries=places"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/public/js/languageSwitcher.js"></script>
+    <script src="/public/js/config.js"></script>
+    <script src="/public/js/theme.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Handle click on custom file input to open the hidden file input
+        document.querySelectorAll(".custom-f-input").forEach((customInput) => {
+          const fileInputSelector = customInput.getAttribute("data-toggle");
+          const fileInput = document.querySelector(fileInputSelector);
+          const titleDiv = customInput.querySelector(".title");
+          const removeDiv = customInput.querySelector(".remove");
+
+          // Show file input on custom input click
+          customInput.addEventListener("click", () => {
+            fileInput.click();
+          });
+
+          // Handle file selection
+          fileInput.addEventListener("change", () => {
+            if (fileInput.files && fileInput.files.length > 0) {
+              const fileName = fileInput.files[0].name;
+              titleDiv.textContent = fileName; // Update the title to show file name
+              removeDiv.style.display = "block"; // Show the remove button
+            }
+          });
+
+          // Handle file removal
+          removeDiv.addEventListener("click", (event) => {
+            event.stopPropagation(); // Prevent triggering file selection
+            fileInput.value = ""; // Clear the file input
+            titleDiv.textContent = "<%= __('choose_file') %>"; // Reset the title
+            removeDiv.style.display = "none"; // Hide the remove button
+          });
+        });
+
+        // Handle opening the modal
+        document.querySelectorAll(".item_catalogue").forEach((item) => {
+          item.addEventListener("click", () => {
+            const modalId = item.getAttribute("data-id");
+            const modal = document.getElementById(modalId);
+
+            if (modal) {
+              modal.style.display = "flex"; // Set modal display to flex
+              const modalContainer = modal.querySelector(".modal_container");
+              if (modalContainer) {
+                modalContainer.style.opacity = "1"; // Set opacity to 1
+              }
+              document.body.classList.add("mh100"); // Add mh100 class to body
+            }
+          });
+        });
+
+        // Handle closing the modal
+        document.querySelectorAll(".modal_ .close").forEach((closeButton) => {
+          closeButton.addEventListener("click", () => {
+            const modal = closeButton.closest(".modal_");
+
+            if (modal) {
+              modal.style.display = "none"; // Hide modal
+              const modalContainer = modal.querySelector(".modal_container");
+              if (modalContainer) {
+                modalContainer.style.opacity = "0"; // Set opacity to 0
+              }
+              document.body.classList.remove("mh100"); // Remove mh100 class from body
+              // Reload the page when the alert is closed
+              window.location.reload();
+            }
+          });
+        });
+      });
+    </script>
+
+    <script>
+      const API_URL = apiBaseUrl;
+      document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("catalogueForm");
+        const formButton = form.querySelector("button");
+        const titleInput = document.getElementById("title");
+        const fileInput = document.getElementById("file");
+        const customFileInput = document.querySelector(".custom-f-input");
+        const titleError = document.createElement("div");
+        const fileError = document.createElement("div");
+        const addFormAlert = document.getElementById("addFormAlert");
+
+        // Initialize Quill editor for the "About" section
+        const quill = new Quill("#description", {
+          theme: "snow",
+          placeholder: "<%= __('enter_description_opt') %>",
+          modules: {
+            toolbar: false, // This hides the toolbar
+          },
+        });
+
+        // Add error class for alerts
+        titleError.classList.add("form-alert", "error");
+        fileError.classList.add("form-alert", "error");
+
+        // Form submission
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          // Reset alerts
+          titleError.textContent = "";
+          fileError.textContent = "";
+
+          // Validate title
+          const title = titleInput.value.trim();
+          if (!title) {
+            titleError.textContent = "<%- __('title_req')%>";
+            titleInput.parentNode.appendChild(titleError);
+            return;
+          }
+
+          // Validate file
+          if (!fileInput.files || fileInput.files.length === 0) {
+            fileError.textContent = "<%- __('file_req')%>";
+            customFileInput.parentNode.appendChild(fileError);
+            return;
+          }
+
+          formButton.textContent = "<%- __('saving')%>";
+          formButton.disabled = true;
+
+          // Get description
+          const description = quill.root.innerHTML.trim();
+          const formData = new FormData();
+
+          formData.append("title", title);
+          formData.append(
+            "description",
+            description !== "<p><br></p>" ? description : ""
+          );
+          formData.append("file", fileInput.files[0]);
+
+          try {
+            // Send form data to the API
+            const response = await axios.post(
+              `${API_URL}/user/catelogue`,
+              formData,
+              {
+                headers: {
+                  Authorization: `Bearer ${document.cookie.replace(
+                    /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+                    "$1"
+                  )}`,
+                  "Content-Type": "multipart/form-data",
+                },
+              }
+            );
+
+            // Show success alert
+            addFormAlert.classList.remove("d-none");
+            addFormAlert.textContent = "<%- __('catalogue_success_saved')%>";
+            formButton.textContent = "<%- __('saved')%>";
+
+            // Reset form fields
+            form.reset();
+            quill.root.innerHTML = "";
+            document.querySelector(".custom-f-input .title").textContent =
+              "<%- __('choose_file')%>";
+            document.querySelector(".custom-f-input .remove").style.display =
+              "none";
+
+            // Hide success alert after 3 seconds
+            setTimeout(() => {
+              addFormAlert.classList.add("d-none");
+              formButton.disabled = false;
+              formButton.textContent = "<%- __('save')%>";
+            }, 3000);
+          } catch (error) {
+            formButton.disabled = false;
+            formButton.textContent = "<%- __('save')%>";
+            // Handle error from backend
+            const errorMessage =
+              error.response?.data?.message || "<%- __('an_error')%>";
+            Swal.fire({
+              icon: "error",
+              title: "<%- __('error')%>",
+              text: "<%- __('an_error_file')%>",
+            });
+          }
+        });
+
+        // Validate title on blur
+        titleInput.addEventListener("blur", () => {
+          if (titleInput.value.trim()) {
+            titleError.textContent = "";
+          }
+        });
+
+        // Handle file input change
+        fileInput.addEventListener("change", () => {
+          const fileName =
+            fileInput.files && fileInput.files.length > 0
+              ? fileInput.files[0].name
+              : "";
+          const titleDiv = customFileInput.querySelector(".title");
+          const removeDiv = customFileInput.querySelector(".remove");
+
+          if (fileName) {
+            titleDiv.textContent = fileName;
+            removeDiv.style.display = "block";
+            fileError.textContent = "";
+          } else {
+            titleDiv.textContent = "<%- __('choose_file')%>";
+            removeDiv.style.display = "none";
+          }
+        });
+
+        // Handle remove button click
+        customFileInput
+          .querySelector(".remove")
+          .addEventListener("click", (e) => {
+            e.stopPropagation();
+            fileInput.value = "";
+            customFileInput.querySelector(".title").textContent =
+              "<%- __('choose_file')%>";
+            customFileInput.querySelector(".remove").style.display = "none";
+          });
+      });
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const catalogueContainer = document.querySelector(".link-wrapper");
+
+        // Always check to ensure the element exists before using it
+        if (!catalogueContainer) {
+          console.error("Could not find .link-wrapper in the DOM.");
+          return;
+        }
+
+        catalogueContainer.addEventListener("click", async (event) => {
+          const button = event.target.closest(".butn-delete");
+          if (button) {
+            const itemId = button.getAttribute("data-id");
+            if (!itemId) return;
+
+            // Confirm deletion with the user
+            const confirmDelete = await Swal.fire({
+              title: "<%- __('delete_catalogue')%>",
+              text: "<%- __('are_you_sure_delete_item')%>",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "#d33",
+              cancelButtonColor: "#3085d6",
+              confirmButtonText: "<%- __('yes_delete_it')%>",
+              cancelButtonText: "<%- __('cancel')%>",
+            });
+
+            if (!confirmDelete.isConfirmed) return;
+
+            // Send DELETE request to backend
+            try {
+              const response = await axios.delete(
+                `${API_URL}/user/catelogue/${itemId}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${document.cookie.replace(
+                      /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+                      "$1"
+                    )}`,
+                  },
+                }
+              );
+
+              Swal.fire({
+                title: "<%- __('deleted')%>",
+                text: response.data?.message || "<%- __('catelogue_deleted')%>",
+                icon: "success",
+              });
+              window.location.reload();
+            } catch (error) {
+              Swal.fire({
+                title: "<%- __('error')%>",
+                text:
+                  error.response?.data?.message ||
+                  "<%- __('failed_deleting')%>",
+                icon: "error",
+              });
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

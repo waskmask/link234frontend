@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="/public/images/linkhub-icon.png"
+      type="image/x-icon"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css"
+      rel="stylesheet"
+    />
+    <title><%-__('account') %> | Link234</title>
+    <link rel="stylesheet" href="/public/style/theme.css" />
+  </head>
+  <body>
+    <%- include('partials/app-header') %>
+    <main>
+      <div class="layout" style="padding-bottom: 60px; padding-top: 65px">
+        <div class="dashboard-wrapper">
+          <div class="page-header">
+            <div class="title"><%= __('account') %></div>
+          </div>
+          <div class="page-content">
+            <% if(!user.verified){%>
+            <div class="mb-4">
+              <div
+                class="form-alert error mb-3"
+                style="width: fit-content; background: #ffd3d3; padding: 0.5rem"
+              >
+                <%-__('your_email_not_verified')%>
+              </div>
+              <button
+                id="resendEmailVerification"
+                class="butn butn-sm butn-link"
+              >
+                <%-__('get_email_v_link')%>
+              </button>
+            </div>
+            <% }%>
+            <form id="changeEmailForm">
+              <div class="mw600">
+                <div class="mb-3">
+                  <label for="email"><%= __('email') %></label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="email"
+                    name="email"
+                    placeholder="<%= __('email') %>"
+                    readonly
+                    value="<%= user.email %>"
+                  />
+                </div>
+                <div class="dfac">
+                  <button class="butn butn-sm butn-primary">
+                    <%-__('change_email')%>
+                  </button>
+                </div>
+              </div>
+            </form>
+            <!--  -->
+            <div class="mw600" style="margin-top: 35px">
+              <div class="mb-3">
+                <button id="deleteAccount" class="butn butn-danger">
+                  <%= __('delete_account') %>
+                </button>
+              </div>
+            </div>
+            <!--  -->
+          </div>
+        </div>
+      </div>
+    </main>
+    <%- include('partials/app-footer') %>
+
+    <!-- javascript -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"
+      integrity="sha512-DdX/YwF5e41Ok+AI81HI8f5/5UsoxCVT9GKYZRIzpLxb8Twz4ZwPPX+jQMwMhNQ9b5+zDEefc+dcvQoPWGNZ3g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/public/js/languageSwitcher.js"></script>
+    <script src="/public/js/config.js"></script>
+    <script src="/public/js/theme.js"></script>
+
+    <script>
+      const API_URL = apiBaseUrl;
+      function translateResendVerificationError(apiMessage) {
+        const translations = {
+          user_not_found: "<%= __('user_not_found') %>",
+          email_is_already_verified: "<%= __('email_is_already_verified') %>",
+          failed_resending_verification_email:
+            "<%= __('failed_resending_verification_email') %>",
+          // You can add more keys as needed.
+          // For success, you might have:
+          verification_email_resent: "<%= __('verification_email_resent') %>",
+        };
+        return translations[apiMessage] || apiMessage;
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const resendEmailVerification = document.getElementById(
+          "resendEmailVerification"
+        );
+
+        if (resendEmailVerification) {
+          resendEmailVerification.addEventListener("click", () => {
+            resendEmailVerification.textContent = "<%= __('sending_email') %>";
+            const email = "<%= user.email %>";
+
+            axios
+              .post(
+                `${API_URL}/auth/resend-verification`,
+                { email },
+                {
+                  withCredentials: true,
+                  headers: { "Content-Type": "application/json" },
+                }
+              )
+              .then((response) => {
+                const localizedMsg = translateResendVerificationError(
+                  response.data.message
+                );
+                resendEmailVerification.disabled = true;
+                resendEmailVerification.textContent =
+                  "<%-__('verification_email_resent')%>";
+                Swal.fire({
+                  title: localizedMsg,
+                  text: "<%= __('please_check_your_inbox') %>",
+                  icon: "success",
+                  confirmButtonText: "<%= __('okay') %>",
+                });
+              })
+              .catch((error) => {
+                const apiMessage =
+                  error.response?.data?.message || "unknown_error";
+                const localizedMessage =
+                  translateResendVerificationError(apiMessage);
+                Swal.fire({
+                  title: "<%= __('error') %>",
+                  text: localizedMessage,
+                  icon: "error",
+                  confirmButtonText: "<%= __('okay') %>",
+                });
+              });
+          });
+        }
+      });
+    </script>
+    <script>
+      // Function to translate API message keys into localized strings
+      function translateChangeEmailMessage(apiMessage) {
+        const translations = {
+          email_changed_successfully_please_verify_new_email:
+            "<%= __('email_changed_successfully_please_verify_new_email') %>",
+          new_email_required: "<%= __('new_email_required') %>",
+          email_already_registered: "<%= __('email_already_registered') %>",
+          user_not_found: "<%= __('user_not_found') %>",
+          unknown_error: "<%= __('unknown_error') %>",
+          // Add more keys as needed
+        };
+        return translations[apiMessage] || apiMessage;
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const changeEmailForm = document.getElementById("changeEmailForm");
+        const emailInput = changeEmailForm.querySelector("input[name='email']");
+        const changeEmailButton = changeEmailForm.querySelector("button");
+
+        // Flag to track if we're in editing mode
+        let editing = false;
+
+        changeEmailButton.addEventListener("click", (e) => {
+          e.preventDefault();
+
+          if (!editing) {
+            // First click: enable editing
+            emailInput.removeAttribute("readonly");
+            changeEmailButton.classList.remove("butn-primary");
+            changeEmailButton.classList.add("butn-link");
+            emailInput.focus();
+            editing = true;
+          } else {
+            // Second click: submit the change
+            const newEmail = emailInput.value.trim();
+            console.log(newEmail);
+
+            if (!newEmail) {
+              Swal.fire({
+                icon: "error",
+                title: "<%= __('error') %>",
+                text: translateChangeEmailMessage("new_email_required"),
+              });
+              return;
+            }
+
+            changeEmailButton.disabled = true;
+            changeEmailButton.textContent = "<%-__('please_wait')%>";
+            axios
+              .put(
+                `${API_URL}/auth/change-email`,
+                { newEmail },
+                {
+                  headers: {
+                    Authorization: `Bearer ${document.cookie.replace(
+                      /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+                      "$1"
+                    )}`,
+                    "Content-Type": "application/json",
+                  },
+                }
+              )
+              .then((response) => {
+                // Translate the server message and display success alert
+                const translatedMsg = translateChangeEmailMessage(
+                  response.data.message
+                );
+                changeEmailButton.textContent = "<%-__('done')%>";
+                Swal.fire({
+                  icon: "success",
+                  title: "<%= __('email_changed') %>",
+                  text: translatedMsg,
+                }).then(() => {
+                  // Reset form state
+                  emailInput.setAttribute("readonly", "readonly");
+                  changeEmailButton.classList.remove("butn-link");
+                  changeEmailButton.classList.add("butn-primary");
+                  editing = false;
+                  changeEmailButton.disabled = false;
+                  window.location.reload();
+                });
+              })
+              .catch((error) => {
+                // Translate error message and show error alert
+                const apiMessage =
+                  error.response?.data?.message || "unknown_error";
+                const translatedMsg = translateChangeEmailMessage(apiMessage);
+                Swal.fire({
+                  icon: "error",
+                  title: "<%= __('error') %>",
+                  text: translatedMsg,
+                });
+                changeEmailButton.disabled = false;
+                changeEmailButton.textContent = "<%-__('change_email')%>";
+              });
+          }
+        });
+      });
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const deleteAccountButton = document.getElementById("deleteAccount");
+        if (!deleteAccountButton) return;
+
+        deleteAccountButton.addEventListener("click", async () => {
+          // Show confirmation dialog using SweetAlert
+          const result = await Swal.fire({
+            title: "<%= __('delete_account') %>",
+            text: "<%= __('are_you_sure_delete_account') %>",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "<%= __('yes_delete') %>",
+            cancelButtonText: "<%= __('cancel') %>",
+          });
+
+          if (!result.isConfirmed) return;
+
+          try {
+            // Send DELETE request to backend to delete account
+            const response = await axios.delete(
+              `${API_URL}/user/delete-account`,
+              {
+                withCredentials: true,
+                headers: {
+                  Authorization: `Bearer ${document.cookie.replace(
+                    /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+                    "$1"
+                  )}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+
+            // On success, translate the server message (assuming the server returns a key)
+            const serverMessage = response.data.message; // e.g., "Account deleted successfully"
+            Swal.fire({
+              icon: "success",
+              title: "<%= __('success') %>",
+              text: "<%= __('account_deleted_successfully') %>",
+            }).then(() => {
+              // Clear the token cookie.
+              // Note: If the cookie is HTTP-only, the backend should clear it.
+              document.cookie =
+                "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+              // Redirect to the login page.
+              window.location.href = "/login";
+            });
+          } catch (error) {
+            // Get the error message key from the server and translate it
+            const apiMessage =
+              error.response?.data?.message ||
+              "<%= __('failed_delete_account') %>";
+            Swal.fire({
+              icon: "error",
+              title: "<%= __('error') %>",
+              text: apiMessage,
+            });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

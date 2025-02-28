@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="/public/images/linkhub-icon.png"
+      type="image/x-icon"
+    />
+    <title>Link234 - <%-__('subtitle') %></title>
+    <link rel="stylesheet" href="/public/style/theme.css" />
+  </head>
+  <body>
+    <%- include('partials/header') %>
+    <main>
+      <section class="hero">
+        <div class="layout">
+          <div class="hero-content">
+            <div class="grid">
+              <div class="col">
+                <div class="title"><%- __('hero.title') %></div>
+                <div class="sub mt-3"><%- __('hero.subtext') %></div>
+                <button class="butn butn-xl butn-secondary mt-4">
+                  <%- __('hero.button') %>
+                </button>
+              </div>
+              <div class="col">
+                <img
+                  src="/public/images/hero1.webp"
+                  alt="social-icons
+                "
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="hero"
+        style="background-color: #f1f1f3; padding-top: 60px"
+      >
+        <div class="layout">
+          <div class="hero-content">
+            <div class="grid">
+              <div class="col">
+                <img
+                  src="/public/images/catalogue-img1.png"
+                  alt="social-icons
+                "
+                />
+              </div>
+              <div class="col">
+                <div class="title"><%- __('Catalogue.title') %></div>
+                <div class="sub mt-3"><%- __('Catalogue.subtext') %></div>
+                <button class="butn butn-xl butn-secondary mt-4">
+                  <%- __('Catalogue.button') %>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section
+        class="hero"
+        style="background-color: #e8e8e8; padding-top: 60px"
+      >
+        <div class="layout">
+          <div class="title text-center mb-4"><%- __('features.title') %></div>
+          <div class="grid-3" style="margin-top: 50px">
+            <div class="col l-blurb">
+              <div class="head">
+                <img src="/public/images/social-li.png" alt="social links" />
+              </div>
+              <div class="body">
+                <div class="text"><%- __('features.social_integration') %></div>
+              </div>
+            </div>
+
+            <div class="col l-blurb">
+              <div class="head">
+                <img src="/public/images/all-li.png" alt="all links" />
+              </div>
+              <div class="body">
+                <div class="text"><%- __('features.custom_links') %></div>
+              </div>
+            </div>
+
+            <div class="col l-blurb">
+              <div class="head">
+                <img src="/public/images/linkqr-li.png" alt="link QR" />
+              </div>
+              <div class="body">
+                <div class="text"><%- __('features.qr_codes') %></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="content bgpale">
+        <div class="layout">
+          <div class="title mw800 mx-auto txl text-center">
+            <%- __('visibility.title') %>
+          </div>
+          <div class="dfjc mt-4">
+            <button class="butn butn-xl butn-secondary">
+              <%- __('visibility.button') %>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="content" id="memberships">
+        <div class="layout">
+          <div class="title mw800 mx-auto txl text-center">
+            <%- __('membership.title') %>
+          </div>
+
+          <div class="memberships">
+            <div class="membership">
+              <div class="head">
+                <div class="title"><%- __('membership.basic.title') %></div>
+              </div>
+              <div class="body">
+                <ul class="check-list">
+                  <li class="not-av">
+                    <%- __('membership.basic.features.0') %>
+                  </li>
+                  <li class="not-av">
+                    <%- __('membership.basic.features.1') %>
+                  </li>
+                  <li><%- __('membership.basic.features.2') %></li>
+                  <li><%- __('membership.basic.features.3') %></li>
+                  <li><%- __('membership.basic.features.4') %></li>
+                  <li><%- __('membership.basic.features.5') %></li>
+                  <li><%- __('membership.basic.features.6') %></li>
+                  <li><%- __('membership.basic.features.7') %></li>
+                  <li><%- __('membership.basic.features.8') %></li>
+                  <li><%- __('membership.basic.features.9') %></li>
+                </ul>
+              </div>
+              <div class="footer">
+                <div class="free">
+                  <%- __('membership.basic.free_period') %>
+                </div>
+                <div class="sm"><%- __('membership.basic.price_label') %></div>
+                <div class="price"><%- __('membership.basic.price') %></div>
+                <div class="p-c"><%- __('membership.basic.billing') %></div>
+                <button class="butn butn-secondary mt-4">
+                  <%- __('membership.basic.button') %>
+                </button>
+              </div>
+            </div>
+
+            <div class="membership">
+              <div class="head">
+                <div class="title">+ Plus</div>
+              </div>
+              <div class="body">
+                <ul class="check-list">
+                  <li><%- __('membership.basic.features.0') %></li>
+                  <li><%- __('membership.basic.features.1') %></li>
+                  <li><%- __('membership.basic.features.2') %></li>
+                  <li><%- __('membership.basic.features.3') %></li>
+                  <li><%- __('membership.basic.features.4') %></li>
+                  <li><%- __('membership.basic.features.5') %></li>
+                  <li><%- __('membership.basic.features.6') %></li>
+                  <li><%- __('membership.basic.features.7') %></li>
+                  <li><%- __('membership.basic.features.8') %></li>
+                  <li><%- __('membership.basic.features.9') %></li>
+                </ul>
+              </div>
+              <div class="footer">
+                <div class="free"><%- __('membership.plus.free_period') %></div>
+                <div class="sm"><%- __('membership.plus.price_label') %></div>
+                <div class="price"><%- __('membership.plus.price') %></div>
+                <div class="p-c"><%- __('membership.plus.billing') %></div>
+                <button class="butn butn-secondary mt-4" disabled>
+                  <%- __('membership.plus.button') %>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <%- include('partials/footer') %>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"
+      integrity="sha512-DdX/YwF5e41Ok+AI81HI8f5/5UsoxCVT9GKYZRIzpLxb8Twz4ZwPPX+jQMwMhNQ9b5+zDEefc+dcvQoPWGNZ3g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="/public/js/theme.js"></script>
+    <script src="/public/js/languageSwitcher.js"></script>
+    <script src="/public/js/config.js"></script>
+    <!-- <script src="/public/js/forms.js"></script> -->
+
+    <script>
+      function toMemeberships() {
+        // Check if the current pathname is the homepage
+        if (window.location.pathname === "/") {
+          // Find the memberships section by its id
+          const membershipsSection = document.getElementById("memberships");
+          if (membershipsSection) {
+            // Smooth scroll to the memberships section
+            membershipsSection.scrollIntoView({ behavior: "smooth" });
+          }
+        } else {
+          // Redirect to the homepage with the hash to scroll to the memberships section
+          window.location.href = "/#memberships";
+        }
+      }
+      function toPrivacy() {
+        window.location.href = "/privacy";
+      }
+      function toContact() {
+        window.location.href = "/contact";
+      }
+      function toCompany() {
+        window.location.href = "/company";
+      }
+      function toTerms() {
+        window.location.href = "/terms";
+      }
+    </script>
+    <script>
+      const API_URL = apiBaseUrl;
+      document.addEventListener("DOMContentLoaded", () => {
+        const newsletterForm = document.getElementById("newsletterForm");
+
+        if (!newsletterForm) return; // ✅ Exit if form does not exist (prevents errors)
+
+        const nameInput = document.getElementById("nl-name");
+        const emailInput = document.getElementById("nl-email");
+        const consentCheckbox = document.getElementById("consentCheckbox");
+        const alertDiv = document.getElementById("newsLettersAlert");
+
+        newsletterForm.addEventListener("submit", async (event) => {
+          event.preventDefault(); // Prevent default form submission
+
+          // Get form values
+          const fullName = nameInput.value.trim();
+          const email = emailInput.value.trim();
+          const consentGiven = consentCheckbox.checked;
+
+          // ✅ Validate all required fields
+          let errorMessage = "";
+          if (!fullName) {
+            errorMessage = "<%= __('full_name_required') %>"; // Add translation key for full name validation
+          } else if (!email) {
+            errorMessage = "<%= __('email_required') %>"; // Use existing email validation
+          } else if (!consentGiven) {
+            errorMessage = "<%= __('consent_required') %>"; // Custom message for consent
+          }
+
+          if (errorMessage) {
+            showAlert(errorMessage, "error");
+            return;
+          }
+
+          try {
+            const response = await axios.post(`${API_URL}/form/submit`, {
+              fullName,
+              email,
+              form_type: "newsletter",
+            });
+
+            showAlert("<%= __('newsletter_signup_success') %>", "success");
+            nameInput.value = "";
+            emailInput.value = "";
+          } catch (error) {
+            let errorMessage = error.message; //
+
+            if (error.response) {
+              const { message, errorType } = error.response.data;
+
+              // Handle different error cases based on errorType
+              if (errorType === "missing_fields") {
+                errorMessage = "Please fill in all required fields.";
+              } else if (errorType === "invalid_email") {
+                errorMessage =
+                  "Invalid email format. Please enter a valid email.";
+              } else if (errorType === "invalid_form_type") {
+                errorMessage = "Form type is incorrect.";
+              } else if (errorType === "server_error") {
+                errorMessage =
+                  "There was a problem processing your request. Try again.";
+              } else {
+                errorMessage = message; // Fallback to the default message from the server
+              }
+            }
+
+            showAlert(errorMessage, "error"); // ✅ Show detailed error message
+          }
+        });
+
+        // Function to display alerts
+        function showAlert(message, type) {
+          alertDiv.textContent = message;
+          alertDiv.className = `form-alert ${type}`; // Set success or error class
+          alertDiv.classList.remove("d-none");
+
+          // Hide alert after 5 seconds
+          setTimeout(() => {
+            alertDiv.classList.add("d-none");
+          }, 5000);
+        }
+      });
+    </script>
+  </body>
+</html>

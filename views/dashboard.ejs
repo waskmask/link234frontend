@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="/public/images/linkhub-icon.png"
+      type="image/x-icon"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css"
+      rel="stylesheet"
+    />
+    <title><%-__('dashboard')%> | Link234</title>
+    <link rel="stylesheet" href="/public/style/theme.css" />
+  </head>
+  <body>
+    <%- include('partials/app-header') %>
+    <main>
+      <div class="layout" style="padding-bottom: 60px; padding-top: 65px">
+        <div class="dashboard-wrapper">
+          <div class="page-header">
+            <div class="title"><%= __('dashboard') %></div>
+          </div>
+          <div class="page-content">
+            <div class="grid-2">
+              <div>
+                <div class="coverimage">
+                  <% if (!user.coverImage || user.coverImage.trim() === "") { %>
+                  <!-- Render this if coverImage is empty or does not exist -->
+                  <div class="empty">
+                    <img src="/public/images/c-holder.png" alt="cover image" />
+                    <div class="action">
+                      <div class="upload" id="uploadCoverButton">
+                        <%- __('upload_cover') %>
+                      </div>
+                    </div>
+                    <form id="coverImageForm" style="display: none">
+                      <input
+                        type="file"
+                        id="coverImageInput"
+                        name="coverImage"
+                      />
+                    </form>
+                  </div>
+                  <% } else { %>
+                  <!-- Render this if coverImage exists -->
+                  <div class="hasCover">
+                    <img
+                      src="<%- staticBaseUrl%><%= user.coverImage %>"
+                      alt="Cover Image"
+                    />
+                    <div class="action">
+                      <div class="toggle-action"><%- __('edit')%></div>
+                      <div class="dd-action">
+                        <div class="change-upload" id="uploadCoverButton">
+                          <%- __('change_cover')%>
+                        </div>
+                        <div class="delete" id="deleteCover">
+                          <%- __('delete_cover')%>
+                        </div>
+                      </div>
+                    </div>
+                    <form id="coverImageForm" style="display: none">
+                      <input
+                        type="file"
+                        id="coverImageInput"
+                        name="coverImage"
+                      />
+                    </form>
+                  </div>
+                  <% } %>
+                </div>
+
+                <!-- profile image -->
+                <div class="p-img-wrapper mb-4">
+                  <div class="profileImage">
+                    <% if (!user.profileImage || user.profileImage.trim() ===
+                    "") { %>
+                    <div class="empty">
+                      <img
+                        src="/public/images/p-holder.png"
+                        alt="profile image"
+                      />
+                      <div class="upload-pi" id="uploadProfileButton">
+                        <%- __('upload')%>
+                      </div>
+                    </div>
+                    <% } else { %>
+                    <div class="hasPImage">
+                      <img
+                        src="<%- staticBaseUrl%><%= user.profileImage %>"
+                        alt="profile image"
+                      />
+                      <div class="action_">
+                        <div class="change-pi" id="uploadProfileButton">
+                          <%- __('change')%>
+                        </div>
+                        <div class="delete-pi" id="deleteProfileImage">
+                          <img
+                            src="/public/images/icons/delete.svg"
+                            alt="delete"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <% } %>
+                    <div class="p-title">
+                      <div class="name"><%= user.profileName %></div>
+                      <div class="uname">
+                        @<%= user.username %> |
+                        <span class="t-cap"><%= user.type %></span>
+                      </div>
+                    </div>
+                    <form id="profileImageForm" style="display: none">
+                      <input
+                        type="file"
+                        id="profileImageInput"
+                        name="profileImage"
+                      />
+                    </form>
+                  </div>
+                </div>
+
+                <!-- profile details -->
+                <div class="title-xs t-edit t-primary">
+                  <span> <%- __('about')%></span>
+                  <button class="butn butn-sm butn-primary" id="goToEdit">
+                    <%- __('edit')%>
+                  </button>
+                </div>
+                <div class="text mb-4">
+                  <% if (user.aboutUs && user.aboutUs.trim() !== "") { %> <%-
+                  user.aboutUs %> <% } else { %> Not added yet <% } %>
+                </div>
+                <div class="title-xs"><%- __('address')%></div>
+                <div class="text mb-4">
+                  <% const { street, houseNo, postcode, city, country } =
+                  user.address || {}; const addressParts = []; if (street)
+                  addressParts.push(street); if (houseNo)
+                  addressParts.push(houseNo); if (postcode)
+                  addressParts.push(postcode); if (city)
+                  addressParts.push(city); if (country)
+                  addressParts.push(country); %> <%- addressParts.join(", ") %>
+                </div>
+                <div class="title-xs"><%- __('contact')%></div>
+                <div class="text">Phone: <%- user.phoneNumber %></div>
+                <div class="text">Email: <%- user.email %></div>
+              </div>
+              <!-- col 2 -->
+              <div>
+                <div class="title-xs t-edit mb-4 t-primary">
+                  <span>Social links</span>
+                  <button
+                    class="butn butn-sm butn-primary"
+                    onclick="goToLinks()"
+                  >
+                    <%- __('add_edit')%>
+                  </button>
+                </div>
+                <div style="margin-bottom: 40px" class="social-icons-to-add">
+                  <% if (user && user.socialLinks &&
+                  Object.values(user.socialLinks).some(link => link.trim() !==
+                  "")) { %> <% Object.entries(user.socialLinks).forEach(([key,
+                  value]) => { %> <% if (value) { %>
+                  <a
+                    href="<%= value %>"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <div class="item" data-key="<%= key %>">
+                      <img
+                        src="/public/images/icons/<%= key %>.svg"
+                        alt="<%= key %>"
+                      />
+                      <div class="t"><%= key %></div>
+                    </div>
+                  </a>
+                  <% } %> <% }); %> <% } else { %>
+                  <p style="margin-right: auto"><%- __('no_social_links')%></p>
+                  <% } %>
+                </div>
+
+                <div class="title-xs t-edit mb-4 t-primary">
+                  <span><%- __('additional_links')%></span>
+                  <button
+                    class="butn butn-sm butn-primary"
+                    onclick="goToLinks()"
+                  >
+                    <%- __('add_edit')%>
+                  </button>
+                </div>
+
+                <div style="margin-bottom: 40px" class="additional_links">
+                  <% if (user && user.additionalLinks &&
+                  user.additionalLinks.length > 0) { %> <%
+                  user.additionalLinks.forEach((link) => { %>
+                  <div class="a-input" data-id="<%= link._id %>">
+                    <label for="<%= link._id %>"><%= link.title %></label>
+                    <a
+                      href="<%= link.link %>"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <div class="social_input mb-3">
+                        <input
+                          style="cursor: pointer"
+                          type="text"
+                          id="<%= link._id %>"
+                          value="<%= link.link %>"
+                          data-title="<%= link.title %>"
+                          readonly
+                        /></div
+                    ></a>
+                  </div>
+                  <% }) %> <% } else { %>
+                  <p><%- __('no_additional_links')%></p>
+                  <% } %>
+                </div>
+
+                <div class="title-xs t-edit mb-4 t-primary">
+                  <span>Catalogues </span>
+                  <button
+                    class="butn butn-sm butn-primary"
+                    onclick="goToCatalogues()"
+                  >
+                    <%- __('add_edit')%>
+                  </button>
+                </div>
+
+                <div>
+                  <% if (user && user.catelogue && user.catelogue.length > 0) {
+                  %> <% user.catelogue.forEach((catelogue) => { %>
+                  <div class="c-item">
+                    <div class="title"><%- catelogue.title %></div>
+                    <div class="desc"><%- catelogue.description %></div>
+                    <div class="view-file">
+                      <a
+                        class="butn butn-primary butn-sm"
+                        target="_blank"
+                        href="<%- staticBaseUrl%>/<%- catelogue.file %>"
+                        ><%= __('view_file') %></a
+                      >
+                      <button
+                        class="butn butn-delete butn-sm"
+                        data-id="<%- catelogue._id %>"
+                      >
+                        <%= __('delete') %>
+                      </button>
+                    </div>
+                  </div>
+                  <% }) %> <% } else { %>
+                  <p><%= __('no_catalogue') %></p>
+                  <% } %>
+                </div>
+              </div>
+              <!-- col end -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <%- include('partials/app-footer') %>
+
+    <!-- javascript -->
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"
+      integrity="sha512-DdX/YwF5e41Ok+AI81HI8f5/5UsoxCVT9GKYZRIzpLxb8Twz4ZwPPX+jQMwMhNQ9b5+zDEefc+dcvQoPWGNZ3g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="/public/js/languageSwitcher.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4ijUxSISsbNS29gjv8onur04fqQ8zets&libraries=places"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/public/js/config.js"></script>
+    <script src="/public/js/theme.js"></script>
+
+    <script>
+      const API_URL = apiBaseUrl;
+      function goToLinks() {
+        window.location.href = "/links";
+      }
+      function goToCatalogues() {
+        window.location.href = "/catalogue";
+      }
+      document.addEventListener("DOMContentLoaded", () => {
+        const editButton = document.getElementById("goToEdit");
+
+        editButton.addEventListener("click", () => {
+          window.location.href = "/edit-profile";
+        });
+
+        const uploadButton = document.getElementById("uploadCoverButton");
+        const coverImageInput = document.getElementById("coverImageInput");
+        const coverImageForm = document.getElementById("coverImageForm");
+
+        if (uploadButton) {
+          // Trigger file input on upload button click
+          uploadButton.addEventListener("click", () => {
+            coverImageInput.click(); // Simulate click on hidden file input
+          });
+        }
+
+        if (coverImageForm) {
+          // Handle file selection
+          coverImageInput.addEventListener("change", async () => {
+            if (coverImageInput.files && coverImageInput.files.length > 0) {
+              const formData = new FormData(coverImageForm);
+              try {
+                const response = await axios.post(
+                  `${API_URL}/user/upload/cover-image`,
+                  formData,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${document.cookie.replace(
+                        /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+                        "$1"
+                      )}`,
+                      "Content-Type": "multipart/form-data",
+                    },
+                  }
+                );
+
+                // Show success message and reload the page
+                Swal.fire({
+                  icon: "success",
+                  title: "<%- __('successTitle') %>",
+                  text: "<%- __('successCoverUpload') %>",
+                }).then(() => {
+                  window.location.reload();
+                });
+              } catch (error) {
+                // Show error message
+                Swal.fire({
+                  icon: "error",
+                  title: "<%- __('errorTitle') %>",
+                  text:
+                    error.response?.data?.message ||
+                    "<%- __('errorCoverUpload') %>",
+                });
+              }
+            }
+          });
+        }
+
+        // change cover or delete cover dropdown
+        const toggleAction = document.querySelector(".toggle-action");
+        const ddAction = document.querySelector(".dd-action");
+
+        if (toggleAction && ddAction) {
+          // Toggle 'show' class on click of toggle-action
+          toggleAction.addEventListener("click", (event) => {
+            event.stopPropagation(); // Prevent the click from propagating to the document
+            ddAction.classList.toggle("show");
+          });
+
+          // Hide dd-action when clicking outside
+          document.addEventListener("click", (event) => {
+            if (
+              !ddAction.contains(event.target) &&
+              !toggleAction.contains(event.target)
+            ) {
+              ddAction.classList.remove("show");
+            }
+          });
+        }
+
+        const deleteCoverButton = document.getElementById("deleteCover");
+
+        if (deleteCoverButton) {
+          deleteCoverButton.addEventListener("click", async () => {
+            // Show confirmation dialog with SweetAlert
+            const result = await Swal.fire({
+              title: "<%- __('deleteCoverTitle')%>",
+              text: "<%- __('deleteCoverText')%>",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "#d33",
+              cancelButtonColor: "#3085d6",
+              confirmButtonText: "<%- __('confirmButton')%>",
+              cancelButtonText: "<%- __('cancel')%>",
+            });
+
+            if (result.isConfirmed) {
+              try {
+                // Send DELETE request to backend
+                const response = await axios.delete(
+                  `${API_URL}/user/delete/cover-image`,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${document.cookie.replace(
+                        /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+                        "$1"
+                      )}`,
+                    },
+                  }
+                );
+
+                // Show success alert
+                Swal.fire({
+                  icon: "success",
+                  title: "<%- __('successTitle')%>",
+                  text: "<%- __('successText')%>",
+                }).then(() => {
+                  // Reload the page to reflect changes
+                  window.location.reload();
+                });
+              } catch (error) {
+                console.error("<%- __('errorDeletingCover')%>:", error);
+
+                // Show error alert
+                Swal.fire({
+                  icon: "error",
+                  title: "<%- __('errorTitle')%>",
+                  text:
+                    error.response?.data?.message || "<%- __('errorText')%>",
+                });
+              }
+            }
+          });
+        }
+
+        const uploadPButton = document.getElementById("uploadProfileButton");
+        const profileImageInput = document.getElementById("profileImageInput");
+        const profileImageForm = document.getElementById("profileImageForm");
+
+        if (uploadPButton) {
+          // Trigger file input on upload button click
+          uploadPButton.addEventListener("click", () => {
+            profileImageInput.click(); // Simulate click on hidden file input
+          });
+        }
+
+        if (profileImageForm) {
+          // Handle file selection
+          profileImageInput.addEventListener("change", async () => {
+            if (profileImageInput.files && profileImageInput.files.length > 0) {
+              const formData = new FormData(profileImageForm);
+              try {
+                const response = await axios.post(
+                  `${API_URL}/user/upload/profile-image`,
+                  formData,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${document.cookie.replace(
+                        /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+                        "$1"
+                      )}`,
+                      "Content-Type": "multipart/form-data",
+                    },
+                  }
+                );
+
+                // Show success message and reload the page
+                Swal.fire({
+                  icon: "success",
+                  title: "<%- __('successTitle')%>",
+                  text: "<%- __('successProfileUpload')%>",
+                }).then(() => {
+                  window.location.reload();
+                });
+              } catch (error) {
+                // Show error message
+                Swal.fire({
+                  icon: "error",
+                  title: "Error!",
+                  text:
+                    error.response?.data?.message ||
+                    "<%- __('errorProfileUpload')%>",
+                });
+              }
+            }
+          });
+        }
+        const deleteProfileImageButton =
+          document.getElementById("deleteProfileImage");
+
+        if (deleteProfileImageButton) {
+          deleteProfileImageButton.addEventListener("click", async () => {
+            // Show confirmation dialog
+            const result = await Swal.fire({
+              title: "<%- __('deleteProfileTitle') %>", // i18n key for the title
+              text: "<%- __('deleteProfileText') %>", // i18n key for the description
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "#d33",
+              cancelButtonColor: "#3085d6",
+              confirmButtonText: "<%- __('confirmButton') %>", // i18n key for confirm button
+              cancelButtonText: "<%- __('cancel') %>", // i18n key for cancel button
+            });
+
+            if (result.isConfirmed) {
+              try {
+                // Send DELETE request to backend
+                const response = await axios.delete(
+                  `${API_URL}/user/delete/profile-image`,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${document.cookie.replace(
+                        /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+                        "$1"
+                      )}`,
+                    },
+                  }
+                );
+
+                // Show success alert
+                Swal.fire({
+                  icon: "success",
+                  title: "<%- __('successTitle') %>", // i18n key for success title
+                  text: "<%- __('successProfileText') %>", // i18n key for success description
+                }).then(() => {
+                  // Reload the page to reflect changes
+                  window.location.reload();
+                });
+              } catch (error) {
+                console.error("<%-__('error_deleting_profile_image')%>", error);
+
+                // Show error alert
+                Swal.fire({
+                  icon: "error",
+                  title: "<%- __('errorTitle') %>", // i18n key for error title
+                  text: "<%- __('errorProfileText') %>", // i18n key for error description
+                });
+              }
+            }
+          });
+        }
+      });
+    </script>
+    <script>
+      function toPrivacy() {
+        window.location.href = "/privacy";
+      }
+      function toContact() {
+        window.location.href = "/contact";
+      }
+      function toCompany() {
+        window.location.href = "/company";
+      }
+      function toTerms() {
+        window.location.href = "/terms";
+      }
+      function toHome() {
+        window.location.href = "/";
+      }
+    </script>
+  </body>
+</html>

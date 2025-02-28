@@ -1,0 +1,79 @@
+<header>
+  <nav class="layout">
+    <div class="logo">
+      <img onclick="toHome()" src="/public/images/logo-f1.svg" alt="Logo" />
+    </div>
+    <div class="menu_overlay"></div>
+    <div class="menu_burger">
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+
+    <div class="menu">
+      <div class="menu_close">+</div>
+      <div class="menu-links">
+        <div class="link-m">
+          <a class="" href=""><%-__('home') %></a>
+        </div>
+        <div class="link-m">
+          <a class="" href="javascript:void(0)" onclick="toMemeberships()"
+            ><%-__('memberships') %></a
+          >
+        </div>
+      </div>
+      <% if(loggedIn){ %>
+      <button class="butn-secondary butn" id="toDashboard">
+        <%-__('dashboard') %>
+      </button>
+      <% } else{%>
+      <button class="butn-secondary butn" id="toLogin">
+        <%-__('login') %>
+      </button>
+      <button class="butn-light butn" id="toRegister">
+        <%-__('register') %>
+      </button>
+      <% }%>
+    </div>
+
+    <div class="languageSwitcher me-1">
+      <div class="toggle">
+        <img src="/public/flags/en.svg" alt="flag" />
+      </div>
+      <div class="dropdown">
+        <div class="item" data-value="en">
+          <img src="/public/flags/gb.svg" alt="flag" />
+          <span><%= __("English") %></span>
+        </div>
+        <div class="item" data-value="fr">
+          <img src="/public/flags/fr.svg" alt="flag" />
+          <span><%= __("French") %></span>
+        </div>
+        <div class="item" data-value="de">
+          <img src="/public/flags/de.svg" alt="flag" />
+          <span><%= __("German") %></span>
+        </div>
+        <div class="item" data-value="it">
+          <img src="/public/flags/it.svg" alt="flag" />
+          <span><%= __("Italian") %></span>
+        </div>
+        <div class="item" data-value="pt">
+          <img src="/public/flags/pt.svg" alt="flag" />
+          <span><%= __("Portuguese") %></span>
+        </div>
+        <div class="item" data-value="pl">
+          <img src="/public/flags/pl.svg" alt="flag" />
+          <span><%= __("Polish") %></span>
+        </div>
+        <div class="item" data-value="es">
+          <img src="/public/flags/es.svg" alt="flag" />
+          <span><%= __("Spanish") %></span>
+        </div>
+        <div class="item" data-value="tr">
+          <img src="/public/flags/tr.svg" alt="flag" />
+          <span><%= __("Turkish") %></span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>

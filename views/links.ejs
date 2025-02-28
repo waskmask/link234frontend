@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="/public/images/linkhub-icon.png"
+      type="image/x-icon"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css"
+      rel="stylesheet"
+    />
+    <title><%-__('links') %> | Link234</title>
+    <link rel="stylesheet" href="/public/style/theme.css" />
+  </head>
+  <body>
+    <%- include('partials/app-header') %>
+    <main>
+      <div class="layout" style="padding-bottom: 60px; padding-top: 65px">
+        <div class="dashboard-wrapper">
+          <div class="page-header">
+            <div class="title"><%= __('add_social_media') %></div>
+          </div>
+          <div class="page-content">
+            <div class="">
+              <div class="profile-form" style="margin-bottom: 60px">
+                <div class="link-container">
+                  <div class="social-icons-to-add">
+                    <% if (user && user.socialLinks) { %> <%
+                    Object.entries(user.socialLinks).forEach(([key, value]) => {
+                    %> <% if (!value) { %>
+                    <div class="item" data-key="<%= key %>">
+                      <img
+                        src="/public/images/icons/<%= key %>.svg"
+                        alt="<%= key %>"
+                      />
+                      <div class="t"><%= key %></div>
+                    </div>
+                    <% } %> <% }); %> <% } else { %>
+                    <p><%-__('no_social_links')%></p>
+                    <% } %>
+                    <div
+                      class="item_addlink"
+                      data-toggle="modal"
+                      data-id="addLinkModal"
+                    >
+                      <img src="/public/images/icons/plus.svg" alt="plus" />
+                      <div class="t"><%= __('additional_links') %></div>
+                    </div>
+                  </div>
+
+                  <div
+                    class="text-center mt-4 form-alert error"
+                    style="display: none"
+                    id="noSocialSelectAlert"
+                  >
+                    <%-__('please_select_alteast_one_social_media')%>
+                  </div>
+                  <div class="add-link-inputs">
+                    <button class="butn butn-primary" id="addSocialLinks">
+                      + <%= __('add_social_media') %>
+                    </button>
+                  </div>
+
+                  <div class="social-form d-none" id="socialForm">
+                    <form id="socialLinkForm">
+                      <!-- Dynamic inputs will be appended here -->
+                    </form>
+                    <button class="butn butn-primary" id="submitSocialLinks">
+                      <%= __('submit') %>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="link-wrapper">
+                <!-- Render social links if they exist -->
+                <div>
+                  <div class="title-sm mb-3"><%= __('social_links') %></div>
+                  <div class="social_links">
+                    <% if (user && user.socialLinks &&
+                    Object.keys(user.socialLinks).length > 0) { %> <%
+                    Object.entries(user.socialLinks).forEach(([key, value]) => {
+                    %> <% if (value) { %>
+                    <div class="s-input" data-id="<%= key %>">
+                      <label for="<%= key %>"><%= key %></label>
+                      <div class="social_input">
+                        <input
+                          type="text"
+                          id="<%= key %>"
+                          value="<%= value %>"
+                        />
+                        <div class="dfac">
+                          <a
+                            href="<%= value %>"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <img
+                              src="/public/images/icons/redirect.svg"
+                              alt="redirect"
+                            />
+                          </a>
+                          <button class="butn butn-delete butn-sm">
+                            <%= __('delete') %>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <% } %> <% }) %> <% } else { %>
+                    <p><%= __('no_social_added') %></p>
+                    <% } %>
+                  </div>
+                </div>
+
+                <!-- Render additional links if they exist -->
+                <div>
+                  <div class="title-sm mb-3"><%= __('additional_links') %></div>
+                  <div class="additional_links">
+                    <% if (user && user.additionalLinks &&
+                    user.additionalLinks.length > 0) { %> <%
+                    user.additionalLinks.forEach((link) => { %>
+                    <div class="a-input" data-id="<%= link._id %>">
+                      <label for="<%= link._id %>"><%= link.title %></label>
+                      <div class="social_input">
+                        <input
+                          type="text"
+                          id="<%= link._id %>"
+                          value="<%= link.link %>"
+                          data-title="<%= link.title %>"
+                        />
+                        <div class="dfac">
+                          <a
+                            href="<%= link.link %>"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <img
+                              src="/public/images/icons/redirect.svg"
+                              alt="redirect"
+                            />
+                          </a>
+                          <button class="butn butn-delete butn-sm">
+                            <%= __('delete') %>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <% }) %> <% } else { %>
+                    <p><%= __('no_additional_links') %></p>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <%- include('partials/app-footer') %>
+
+    <div class="modal_" id="addLinkModal">
+      <div class="modal_container">
+        <div class="header">
+          <div class="title"><%= __('add_additional_links') %></div>
+          <div class="close">
+            <img src="/public/images/icons/minus.svg" alt="minus" />
+          </div>
+        </div>
+        <div class="body">
+          <form id="addLinkForm">
+            <div class="mb-3">
+              <label for="title"><%= __('title') %></label>
+              <input type="text" id="title" placeholder="<%= __('title') %>" />
+            </div>
+            <div class="mb-3">
+              <label for="title"><%= __('link') %></label>
+              <input
+                type="text"
+                id="link"
+                placeholder="<%= __('url') %>: https://yourlink.com"
+              />
+            </div>
+            <div id="addFormAlert" class="form-alert success d-none">
+              <%= __('added_additionallink_success') %>
+            </div>
+            <button class="butn butn-primary mb-3"><%= __('save') %></button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- javascript -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"
+      integrity="sha512-DdX/YwF5e41Ok+AI81HI8f5/5UsoxCVT9GKYZRIzpLxb8Twz4ZwPPX+jQMwMhNQ9b5+zDEefc+dcvQoPWGNZ3g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4ijUxSISsbNS29gjv8onur04fqQ8zets&libraries=places"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/public/js/languageSwitcher.js"></script>
+    <script src="/public/js/config.js"></script>
+    <script src="/public/js/theme.js"></script>
+    <script>
+      const API_URL = apiBaseUrl;
+      document.addEventListener("DOMContentLoaded", () => {
+        const selectedItems = new Set(); // Keep track of selected items
+        const socialIconsContainer = document.querySelector(
+          ".social-icons-to-add"
+        );
+        const socialForm = document.getElementById("socialForm");
+        const addSocialLinksBtn = document.getElementById("addSocialLinks");
+        const addLinkInputsContainer =
+          document.querySelector(".add-link-inputs");
+
+        // Handle item selection
+        socialIconsContainer.addEventListener("click", (event) => {
+          const item = event.target.closest(".item");
+          if (item) {
+            const key = item.dataset.key;
+
+            if (selectedItems.has(key)) {
+              selectedItems.delete(key);
+              item.classList.remove("selected");
+            } else {
+              selectedItems.add(key);
+              item.classList.add("selected");
+            }
+          }
+        });
+
+        // Handle "Add Social Links" button click
+        addSocialLinksBtn.addEventListener("click", () => {
+          if (selectedItems.size > 0) {
+            // Change the button text to indicate progress
+            addSocialLinksBtn.textContent = "<%-__('processing')%>";
+
+            // Disable the button to prevent multiple clicks
+            addSocialLinksBtn.disabled = true;
+
+            // Wait for 2 seconds before proceeding
+            setTimeout(() => {
+              // Generate input fields dynamically
+              const form = document.getElementById("socialLinkForm");
+              form.innerHTML = "";
+
+              selectedItems.forEach((key) => {
+                const placeholder =
+                  key === "website"
+                    ? "https://example.com"
+                    : `https://${key}.com/username`;
+                form.innerHTML += `
+          <div class="mb-3">
+            <label for="${key}">${
+                  key.charAt(0).toUpperCase() + key.slice(1)
+                }</label>
+            <input
+              type="url"
+              id="${key}"
+              name="${key}"
+              placeholder="${placeholder}"
+              required
+            />
+            <div class="form-alert error" id="${key}-error"></div>
+          </div>
+        `;
+              });
+
+              // Hide social-icons-to-add and add-link-inputs
+              socialIconsContainer.classList.add("d-none");
+              addLinkInputsContainer.classList.add("d-none");
+
+              // Show the form
+              socialForm.classList.remove("d-none");
+
+              // Reset button text and re-enable it
+              addSocialLinksBtn.textContent = "+ <%= __('add_social_media') %>";
+              addSocialLinksBtn.disabled = false;
+            }, 2000); // Wait for 2 seconds
+          } else {
+            const noSocialSelectAlert = document.getElementById(
+              "noSocialSelectAlert"
+            );
+            noSocialSelectAlert.style.display = "block";
+            setTimeout(() => {
+              noSocialSelectAlert.style.display = "none";
+            }, 3000);
+          }
+        });
+
+        // Handle form submission
+        const submitSocialFormBtn =
+          document.getElementById("submitSocialLinks");
+        submitSocialFormBtn.addEventListener("click", async (e) => {
+          e.preventDefault();
+          submitSocialFormBtn.textContent = "<%-__('submitting')%>";
+          const form = document.getElementById("socialLinkForm");
+          const inputs = form.querySelectorAll("input");
+          let isValid = true;
+
+          const socialLinks = {}; // Object to store valid social links
+
+          // Validate the URL
+          const socialUrlRegex =
+            /^(https?:\/\/)(www\.)?[\w.-]+\.[a-zA-Z]{2,}\/[\w_-]+$/;
+
+          inputs.forEach((input) => {
+            const key = input.id;
+            const value = input.value.trim();
+            const errorDiv = document.getElementById(`${key}-error`);
+
+            // If the field is not empty, validate the URL structure
+            if (value !== "" && !socialUrlRegex.test(value)) {
+              isValid = false;
+              errorDiv.textContent = "<%-__('social_url_validation_error')%>";
+              submitSocialFormBtn.textContent = "<%-__('submit')%>";
+            } else {
+              errorDiv.textContent = ""; // Clear previous error
+              if (value !== "") {
+                socialLinks[key] = value; // Add valid links to the object
+              }
+            }
+          });
+
+          if (isValid) {
+            try {
+              // Send the valid social links to the API
+              const response = await axios.put(
+                `${API_URL}/user/update-social-links`,
+                {
+                  socialLinks,
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${document.cookie.replace(
+                      /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+                      "$1"
+                    )}`,
+                  },
+                }
+              );
+              submitSocialFormBtn.textContent = "<%-__('submit')%>";
+              // On success, show SweetAlert success message with a close button
+              Swal.fire({
+                icon: "success",
+                title: "<%-__('success')%>",
+                text: "<%-__('social_links_updated_success')%>",
+                showConfirmButton: true, // Adds a close button
+                confirmButtonText: "<%-__('close')%>",
+              }).then(() => {
+                // Reload the page when the alert is closed
+                window.location.reload();
+              });
+            } catch (error) {
+              submitSocialFormBtn.textContent = "<%-__('submit')%>";
+              // Display error message
+              const errorMessage =
+                error.response?.data?.message ||
+                "<%-__('error_sociallink_update')%>";
+              Swal.fire({
+                icon: "error",
+                title: "<%-__('oops')%>",
+                text: "<%-__('something_went_wrong')%>",
+              });
+            }
+          }
+        });
+
+        // Remove error on blur
+        document.getElementById("socialLinkForm").addEventListener(
+          "blur",
+          (e) => {
+            const input = e.target;
+            if (input.tagName === "INPUT") {
+              const key = input.id;
+              const value = input.value.trim();
+              const errorDiv = document.getElementById(`${key}-error`);
+
+              if (
+                value.startsWith("http://") ||
+                value.startsWith("https://") ||
+                value === ""
+              ) {
+                errorDiv.textContent = ""; // Clear error
+              } else {
+                errorDiv.textContent = "<%-__('url_validation_error')%>";
+              }
+            }
+          },
+          true
+        ); // Use event capturing for blur
+      });
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const socialLinksContainer = document.querySelector(".social_links");
+
+        // Handle input blur to update social links
+        socialLinksContainer.addEventListener(
+          "blur",
+          async (event) => {
+            const input = event.target;
+
+            // Only proceed if the input is a text field
+            if (input.tagName === "INPUT" && input.type === "text") {
+              const key = input.id;
+              const value = input.value.trim();
+
+              // Check if input is empty
+              if (!value) {
+                const errorDiv =
+                  input.parentElement.querySelector(".form-alert.error");
+                if (!errorDiv) {
+                  const newErrorDiv = document.createElement("div");
+                  newErrorDiv.className = "form-alert error";
+                  newErrorDiv.textContent = "<%-__('field_cannot_empty')%>";
+                  input.parentElement.appendChild(newErrorDiv);
+                }
+                return; // Do not proceed if the input is empty
+              }
+
+              // Validate URL
+              const urlPattern =
+                /^(https?:\/\/)(www\.)?[\w.-]+\.[a-zA-Z]{2,}\/[\w_-]+$/;
+
+              if (!urlPattern.test(value)) {
+                const errorDiv =
+                  input.parentElement.querySelector(".form-alert.error");
+                if (!errorDiv) {
+                  const newErrorDiv = document.createElement("div");
+                  newErrorDiv.className = "form-alert error";
+                  newErrorDiv.textContent =
+                    "<%-__('social_url_validation_error')%>";
+                  input.parentElement.appendChild(newErrorDiv);
+                }
+                return; // Do not proceed if the URL is invalid
+              }
+
+              // Remove existing error message if input is valid
+              const existingErrorDiv =
+                input.parentElement.querySelector(".form-alert.error");
+              if (existingErrorDiv) existingErrorDiv.remove();
+
+              try {
+                // Send updated social link to the server
+                const response = await axios.put(
+                  `${API_URL}/user/update-social-links`,
+                  { socialLinks: { [key]: value } },
+                  {
+                    headers: {
+                      Authorization: `Bearer ${document.cookie.replace(
+                        /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+                        "$1"
+                      )}`,
+                    },
+                  }
+                );
+
+                // Show success alert under the input
+                let successDiv = input.parentElement.querySelector(
+                  ".form-alert.success"
+                );
+                if (!successDiv) {
+                  successDiv = document.createElement("div");
+                  successDiv.className = "form-alert success";
+                  input.parentElement.appendChild(successDiv);
+                }
+                successDiv.textContent = "<%-__('link_updated')%>";
+                successDiv.style.color = "green";
+
+                // Remove the success message after 3 seconds
+                setTimeout(() => {
+                  if (successDiv) successDiv.remove();
+                }, 3000);
+              } catch (error) {
+                console.error(
+                  "<%-__('error_sociallink_update')%>",
+                  error.response?.data || error
+                );
+                Swal.fire({
+                  icon: "error",
+                  title: "<%-__('oops')%>",
+                  text: "<%-__('error_link_update')%>",
+                });
+              }
+            }
+          },
+          true
+        );
+      });
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Handle opening the modal
+        document.querySelectorAll(".item_addlink").forEach((item) => {
+          item.addEventListener("click", () => {
+            const modalId = item.getAttribute("data-id");
+            const modal = document.getElementById(modalId);
+
+            if (modal) {
+              modal.style.display = "flex"; // Set modal display to flex
+              const modalContainer = modal.querySelector(".modal_container");
+              if (modalContainer) {
+                modalContainer.style.opacity = "1"; // Set opacity to 1
+              }
+              document.body.classList.add("mh100"); // Add mh100 class to body
+            }
+          });
+        });
+
+        // Handle closing the modal
+        document.querySelectorAll(".modal_ .close").forEach((closeButton) => {
+          closeButton.addEventListener("click", () => {
+            const modal = closeButton.closest(".modal_");
+
+            if (modal) {
+              modal.style.display = "none"; // Hide modal
+              const modalContainer = modal.querySelector(".modal_container");
+              if (modalContainer) {
+                modalContainer.style.opacity = "0"; // Set opacity to 0
+              }
+              document.body.classList.remove("mh100"); // Remove mh100 class from body
+              // Reload the page when the alert is closed
+              window.location.reload();
+            }
+          });
+        });
+
+        // form for additional links
+        const addLinkForm = document.getElementById("addLinkForm");
+        const titleInput = document.getElementById("title");
+        const linkInput = document.getElementById("link");
+        const addFormAlert = document.getElementById("addFormAlert");
+
+        // Handle form submission
+        addLinkForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          // Remove existing error messages
+          document
+            .querySelectorAll(".form-alert.error")
+            .forEach((error) => error.remove());
+
+          const title = titleInput.value.trim();
+          const link = linkInput.value.trim();
+
+          let isValid = true;
+
+          // Validate title
+          if (title === "") {
+            const errorDiv = document.createElement("div");
+            errorDiv.classList.add("form-alert", "error");
+            errorDiv.textContent = "<%-__('title_cannot_empty')%>";
+            titleInput.parentNode.appendChild(errorDiv);
+            isValid = false;
+          }
+
+          // Validate link
+          const urlPattern =
+            /^(https?:\/\/)([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/\S*)?$/;
+          if (link === "") {
+            const errorDiv = document.createElement("div");
+            errorDiv.classList.add("form-alert", "error");
+            errorDiv.textContent = "<%-__('link_cannot_empty')%>.";
+            linkInput.parentNode.appendChild(errorDiv);
+            isValid = false;
+          } else if (!urlPattern.test(link)) {
+            const errorDiv = document.createElement("div");
+            errorDiv.classList.add("form-alert", "error");
+            errorDiv.textContent = "<%- __('url_validation_error')%>";
+            linkInput.parentNode.appendChild(errorDiv);
+            isValid = false;
+          }
+
+          if (!isValid) return; // Stop submission if validation fails
+
+          try {
+            // Fetch existing additional links
+            const userResponse = await axios.get(`${API_URL}/user/get-user`, {
+              headers: {
+                Authorization: `Bearer ${document.cookie.replace(
+                  /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+                  "$1"
+                )}`,
+              },
+            });
+
+            const existingLinks = userResponse.data.additionalLinks || [];
+
+            // Append the new link to the existing links
+            const updatedLinks = [...existingLinks, { title, link }];
+
+            // Send the updated links to the API
+            await axios.put(
+              `${API_URL}/user/update-additional-links`,
+              { additionalLinks: updatedLinks },
+              {
+                headers: {
+                  Authorization: `Bearer ${document.cookie.replace(
+                    /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+                    "$1"
+                  )}`,
+                },
+              }
+            );
+
+            // Show success alert
+            addFormAlert.classList.remove("d-none");
+            addFormAlert.textContent = "<%-__('additionallinks_success')%>";
+
+            // Clear the form
+            titleInput.value = "";
+            linkInput.value = "";
+
+            // Remove success alert after 3 seconds
+            setTimeout(() => {
+              addFormAlert.classList.add("d-none");
+            }, 3000);
+          } catch (error) {
+            // Display error message
+            const errorMessage =
+              error.response?.data?.message ||
+              "<%-__('error_saving_additional_links')%>";
+            const errorAlert = document.createElement("div");
+            errorAlert.classList.add("form-alert", "error");
+            errorAlert.textContent = errorMessage;
+            addLinkForm.appendChild(errorAlert);
+
+            // Remove error alert after 3 seconds
+            setTimeout(() => {
+              if (errorAlert) errorAlert.remove();
+            }, 3000);
+          }
+        });
+      });
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const additionalLinksContainer =
+          document.querySelector(".additional_links");
+
+        // Handle blur for updating additional links
+        additionalLinksContainer.addEventListener(
+          "blur",
+          async (event) => {
+            const input = event.target;
+
+            // Ensure the input is a text field
+            if (input.tagName === "INPUT" && input.type === "text") {
+              const id = input.id; // Unique ID for the link (_id from the database)
+              const value = input.value.trim(); // Updated link value
+              const title = input.getAttribute("data-title"); // Get the title from the data-title attribute
+
+              // Check if input is empty
+              if (!value) {
+                const errorDiv =
+                  input.parentElement.querySelector(".form-alert.error");
+                if (!errorDiv) {
+                  const newErrorDiv = document.createElement("div");
+                  newErrorDiv.className = "form-alert error";
+                  newErrorDiv.textContent = "<%-__('field_cannot_empty')%>";
+                  input.parentElement.appendChild(newErrorDiv);
+                }
+                return; // Stop if the input is empty
+              }
+
+              // Validate URL
+              const urlPattern =
+                /^(https?:\/\/)([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/\S*)?$/;
+
+              if (!urlPattern.test(value)) {
+                const errorDiv =
+                  input.parentElement.querySelector(".form-alert.error");
+                if (!errorDiv) {
+                  const newErrorDiv = document.createElement("div");
+                  newErrorDiv.className = "form-alert error";
+                  newErrorDiv.textContent = "<%- __('url_validation_error')%>";
+                  input.parentElement.appendChild(newErrorDiv);
+                }
+                return; // Stop if the URL is invalid
+              }
+
+              // Remove existing error messages
+              const existingErrorDiv =
+                input.parentElement.querySelector(".form-alert.error");
+              if (existingErrorDiv) existingErrorDiv.remove();
+
+              try {
+                // Prepare the payload for the API
+                const payload = {
+                  additionalLinks: [
+                    {
+                      _id: id, // Send the unique ID for identification
+                      title: title, // Send the title
+                      link: value, // Send the updated link
+                    },
+                  ],
+                };
+
+                // Send updated links to the API
+                const response = await axios.put(
+                  `${API_URL}/user/update-additional-links`,
+                  payload,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${document.cookie.replace(
+                        /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+                        "$1"
+                      )}`,
+                    },
+                  }
+                );
+
+                // Show success alert below the input
+                let successDiv = input.parentElement.querySelector(
+                  ".form-alert.success"
+                );
+                if (!successDiv) {
+                  successDiv = document.createElement("div");
+                  successDiv.className = "form-alert success";
+                  input.parentElement.appendChild(successDiv);
+                }
+                successDiv.textContent = "<%-__('link_updated')%>";
+                successDiv.style.color = "green";
+
+                // Remove the success message after 3 seconds
+                setTimeout(() => {
+                  if (successDiv) successDiv.remove();
+                }, 3000);
+              } catch (error) {
+                console.error(
+                  "<%-__('error_link_update')%>",
+                  error.response?.data || error
+                );
+                Swal.fire({
+                  icon: "error",
+                  title: "<%-__('oops')%>",
+                  text: "<%-__('error_link_update')%>",
+                });
+              }
+            }
+          },
+          true // Event capturing
+        );
+      });
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const socialLinksContainer = document.querySelector(".social_links");
+
+        // Handle click on delete buttons
+        socialLinksContainer.addEventListener("click", async (event) => {
+          const button = event.target.closest(".butn-delete");
+          if (button) {
+            const parentDiv = button.closest(".s-input"); // Find the parent `.s-input` div
+            const socialKey = parentDiv?.dataset.id; // Get the social key from the `data-id`
+
+            if (!socialKey) return;
+
+            // Show SweetAlert confirmation dialog
+            const result = await Swal.fire({
+              title: `<%-__('delete')%> ${socialKey}?`,
+              text: "<%-__('are_you_sure_delete_social_link')%>",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "#d33",
+              cancelButtonColor: "#3085d6",
+              confirmButtonText: "<%-__('yes_delete_it')%>!",
+              cancelButtonText: "<%-__('cancel')%>",
+            });
+
+            if (result.isConfirmed) {
+              try {
+                // Send the delete request to the API
+                const response = await axios.delete(
+                  `${API_URL}/user/delete-social-links`,
+                  {
+                    data: { socialLinks: [socialKey] }, // Send the social key to delete
+                    headers: {
+                      Authorization: `Bearer ${document.cookie.replace(
+                        /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+                        "$1"
+                      )}`,
+                    },
+                  }
+                );
+
+                // Show SweetAlert success message
+                Swal.fire({
+                  title: "<%-__('deleted')%>!",
+                  text: `${socialKey} <%-__('has_been_deleted')%>`,
+                  icon: "success",
+                });
+
+                // Remove the parent `.s-input` div from the DOM
+                parentDiv.remove();
+
+                // Optional: Check if the container is empty and show a fallback message
+                if (!socialLinksContainer.querySelector(".s-input")) {
+                  socialLinksContainer.innerHTML =
+                    "<p><%-__('no_social_links')%></p>";
+                }
+              } catch (error) {
+                console.error(
+                  "<%-__('error_deleting_social')%>",
+                  error.response?.data || error
+                );
+
+                // Show SweetAlert error message
+                Swal.fire({
+                  title: "<%-__('error')%>!",
+                  text:
+                    error.response?.data?.message ||
+                    "<%-__('failed_deleting_social_link')%>",
+                  icon: "error",
+                });
+              }
+            }
+          }
+        });
+
+        const additionalLinksContainer =
+          document.querySelector(".additional_links");
+
+        // Handle click on delete buttons
+        additionalLinksContainer.addEventListener("click", async (event) => {
+          const button = event.target.closest(".butn-delete");
+          if (button) {
+            const parentDiv = button.closest(".a-input"); // Find the parent `.a-input` div
+            const additionalLinkId = parentDiv?.dataset.id; // Get the `_id` from the `data-id` attribute
+
+            if (!additionalLinkId) return;
+
+            // Show SweetAlert confirmation dialog
+            const result = await Swal.fire({
+              title: "<%-__('delete_additional_link')%>",
+              text: "<%-__('are_you_sure_delete_this_link')%>",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "#d33",
+              cancelButtonColor: "#3085d6",
+              confirmButtonText: "<%-__('yes_delete_it')%>",
+              cancelButtonText: "<%-__('cancel')%>",
+            });
+
+            if (result.isConfirmed) {
+              try {
+                // Send the delete request to the API
+                const response = await axios.delete(
+                  `${API_URL}/user/delete-additional-links`,
+                  {
+                    data: { ids: [additionalLinkId] }, // Send the _id of the link to delete
+                    headers: {
+                      Authorization: `Bearer ${document.cookie.replace(
+                        /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+                        "$1"
+                      )}`,
+                    },
+                  }
+                );
+
+                // Show SweetAlert success message
+                Swal.fire({
+                  title: "<%-__('deleted')%>!",
+                  text: "<%-__('additional_link_has_been_deleted')%>",
+                  icon: "success",
+                });
+
+                // Remove the deleted additional link from the DOM
+                parentDiv.remove();
+
+                // Optional: Check if the container is empty and show a fallback message
+                if (!additionalLinksContainer.querySelector(".a-input")) {
+                  additionalLinksContainer.innerHTML =
+                    "<p><%-__('no_additional_links')%></p>";
+                }
+              } catch (error) {
+                console.error(
+                  "<%-__('error_deleting_additional_link')%>",
+                  error.response?.data || error
+                );
+                Swal.fire({
+                  title: "<%-__('error')%>!",
+                  text:
+                    error.response?.data?.message ||
+                    "<%-__('error_deleting_additional_link')%>",
+                  icon: "error",
+                });
+              }
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

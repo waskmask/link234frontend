@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="/public/images/linkhub-icon.png"
+      type="image/x-icon"
+    />
+    <title>Link234 - <%-__('subtitle') %></title>
+    <link rel="stylesheet" href="/public/style/theme.css" />
+  </head>
+  <body>
+    <%- include('partials/header') %>
+    <main>
+      <section class="content" style="margin-top: 65px">
+        <div class="layout">
+          <% if (showPrivacyLangNotice) { %>
+          <div class="languageNotice light mb-3"><%= __("langNotice") %></div>
+          <% } %>
+          <div class="title-c mb-2">Terms and Conditions for Link234</div>
+          Effective Date: 21.02.2025 <br />
+
+          <div class="title-s mt-3 mb-1">1. Intellectual Property Rights</div>
+          Other than the content you own, under these Terms, Link234 and/or its
+          licensors own all the intellectual property rights and materials
+          contained in this Website. You are granted a limited license only for
+          purposes of viewing the material contained on this Website.
+
+          <div class="title-s mt-3 mb-1">2. Restrictions</div>
+          You are specifically restricted from all of the following:
+          <ul class="ml-4">
+            <li>Publishing any Website material in any other media.</li>
+            <li>
+              Selling, sublicensing and/or otherwise commercializing any Website
+              material.
+            </li>
+            <li>Publicly performing and/or showing any Website material.</li>
+            <li>
+              Using this Website in any way that is or may be damaging to this
+              Website.
+            </li>
+            <li>
+              Using this Website in any way that impacts user access to this
+              Website.
+            </li>
+            <li>
+              Using this Website contrary to applicable laws and regulations, or
+              in any way may cause harm to the Website, or to any person or
+              business entity.
+            </li>
+            <li>
+              Engaging in any data mining, data harvesting, data extracting or
+              any other similar activity in relation to this Website.
+            </li>
+            <li>
+              Using this Website to engage in any advertising or marketing
+              without express written consent.
+            </li>
+          </ul>
+
+          <div class="title-s mt-3 mb-1">3. Your Content</div>
+          In these Terms and Conditions, "Your Content" shall mean any audio,
+          video, text, images or other material you choose to display on this
+          Website. By displaying Your Content, you grant Link234 a
+          non-exclusive, worldwide, irrevocable, sub-licensable license to use,
+          reproduce, adapt, publish, translate and distribute it in any and all
+          media.
+
+          <div class="title-s mt-3 mb-1">4. No warranties</div>
+          This Website is provided "as is," with all faults, and Link234 express
+          no representations or warranties, of any kind related to this Website
+          or the materials contained on this Website.
+
+          <div class="title-s mt-3 mb-1">5. Limitation of liability</div>
+          In no event shall Link234, nor any of its officers, directors and
+          employees, be held liable for anything arising out of or in any way
+          connected with your use of this Website whether such liability is
+          under contract. Link234, including its officers, directors and
+          employees shall not be held liable for any indirect, consequential or
+          special liability arising out of or in any way related to your use of
+          this Website.
+
+          <div class="title-s mt-3 mb-1">6. Indemnification</div>
+          You hereby indemnify to the fullest extent Link234 from and against
+          any and/or all liabilities, costs, demands, causes of action, damages
+          and expenses arising in any way related to your breach of any of the
+          provisions of these Terms.
+
+          <div class="title-s mt-3 mb-1">7. Severability</div>
+          If any provision of these Terms is found to be invalid under any
+          applicable law, such provisions shall be deleted without affecting the
+          remaining provisions herein.
+
+          <div class="title-s mt-3 mb-1">8. Variation of Terms</div>
+          Link234 is permitted to revise these terms at any time as it sees fit,
+          and by using this Website you are expected to review these terms on a
+          regular basis.
+
+          <div class="title-s mt-3 mb-1">9. Assignment</div>
+          Link234 is allowed to assign, transfer, and subcontract its rights
+          and/or obligations under these Terms without any notification.
+          However, you are not allowed to assign, transfer, or subcontract any
+          of your rights and/or obligations under these Terms.
+
+          <div class="title-s mt-3 mb-1">10. Entire Agreement</div>
+          These Terms constitute the entire agreement between Link234 and you in
+          relation to your use of this Website, and supersede all prior
+          agreements and understandings.
+
+          <div class="title-s mt-3 mb-1">11. Governing Law & Jurisdiction</div>
+          These Terms will be governed by and interpreted in accordance with the
+          laws of the State/Country/Province of Hesse, Germany, and you submit
+          to the non-exclusive jurisdiction of the state and federal courts
+          located in Germany for the resolution of any disputes.
+
+          <!-- end -->
+        </div>
+      </section>
+    </main>
+    <%- include('partials/footer') %>
+    <script src="/public/js/theme.js"></script>
+    <script src="/public/js/languageSwitcher.js"></script>
+
+    <script>
+      function toMemeberships() {
+        // Check if the current pathname is the homepage
+        if (window.location.pathname === "/") {
+          // Find the memberships section by its id
+          const membershipsSection = document.getElementById("memberships");
+          if (membershipsSection) {
+            // Smooth scroll to the memberships section
+            membershipsSection.scrollIntoView({ behavior: "smooth" });
+          }
+        } else {
+          // Redirect to the homepage with the hash to scroll to the memberships section
+          window.location.href = "/#memberships";
+        }
+      }
+      function toPrivacy() {
+        window.location.href = "/privacy";
+      }
+      function toContact() {
+        window.location.href = "/contact";
+      }
+      function toCompany() {
+        window.location.href = "/company";
+      }
+      function toTerms() {
+        window.location.href = "/terms";
+      }
+      function toHome() {
+        window.location.href = "/";
+      }
+    </script>
+    <script src="/public/js/config.js"></script>
+    <script>
+      const API_URL = apiBaseUrl;
+      document.addEventListener("DOMContentLoaded", () => {
+        const newsletterForm = document.getElementById("newsletterForm");
+
+        if (!newsletterForm) return; // ✅ Exit if form does not exist (prevents errors)
+
+        const nameInput = document.getElementById("nl-name");
+        const emailInput = document.getElementById("nl-email");
+        const consentCheckbox = document.getElementById("consentCheckbox");
+        const alertDiv = document.getElementById("newsLettersAlert");
+
+        newsletterForm.addEventListener("submit", async (event) => {
+          event.preventDefault(); // Prevent default form submission
+
+          // Get form values
+          const fullName = nameInput.value.trim();
+          const email = emailInput.value.trim();
+          const consentGiven = consentCheckbox.checked;
+
+          // ✅ Validate all required fields
+          let errorMessage = "";
+          if (!fullName) {
+            errorMessage = "<%= __('full_name_required') %>"; // Add translation key for full name validation
+          } else if (!email) {
+            errorMessage = "<%= __('email_required') %>"; // Use existing email validation
+          } else if (!consentGiven) {
+            errorMessage = "<%= __('consent_required') %>"; // Custom message for consent
+          }
+
+          if (errorMessage) {
+            showAlert(errorMessage, "error");
+            return;
+          }
+
+          try {
+            const response = await axios.post(`${API_URL}/form/submit`, {
+              fullName,
+              email,
+              form_type: "newsletter",
+            });
+
+            showAlert("<%= __('newsletter_signup_success') %>", "success");
+            nameInput.value = "";
+            emailInput.value = "";
+          } catch (error) {
+            let errorMessage = error.message; //
+
+            if (error.response) {
+              const { message, errorType } = error.response.data;
+
+              // Handle different error cases based on errorType
+              if (errorType === "missing_fields") {
+                errorMessage = "Please fill in all required fields.";
+              } else if (errorType === "invalid_email") {
+                errorMessage =
+                  "Invalid email format. Please enter a valid email.";
+              } else if (errorType === "invalid_form_type") {
+                errorMessage = "Form type is incorrect.";
+              } else if (errorType === "server_error") {
+                errorMessage =
+                  "There was a problem processing your request. Try again.";
+              } else {
+                errorMessage = message; // Fallback to the default message from the server
+              }
+            }
+
+            showAlert(errorMessage, "error"); // ✅ Show detailed error message
+          }
+        });
+
+        // Function to display alerts
+        function showAlert(message, type) {
+          alertDiv.textContent = message;
+          alertDiv.className = `form-alert ${type}`; // Set success or error class
+          alertDiv.classList.remove("d-none");
+
+          // Hide alert after 5 seconds
+          setTimeout(() => {
+            alertDiv.classList.add("d-none");
+          }, 5000);
+        }
+      });
+    </script>
+  </body>
+</html>

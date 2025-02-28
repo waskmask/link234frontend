@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="<%- __('lang') %>">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="/public/images/linkhub-icon.png"
+      type="image/x-icon"
+    />
+    <title>Login | Link234</title>
+    <link rel="stylesheet" href="/public/style/theme.css" />
+    <style>
+      .languageSwitcher {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="auth-wrapper">
+        <div class="auth" style="position: relative">
+          <div class="logo">
+            <img src="/public/images/logo-f1.svg" alt="logo" />
+          </div>
+          <div class="languageSwitcher me-1">
+            <div class="toggle">
+              <img src="/public/flags/en.svg" alt="flag" />
+            </div>
+            <div class="dropdown" style="right: 0">
+              <div class="item" data-value="en">
+                <img src="/public/flags/gb.svg" alt="flag" />
+                <span><%= __("English") %></span>
+              </div>
+              <div class="item" data-value="fr">
+                <img src="/public/flags/fr.svg" alt="flag" />
+                <span><%= __("French") %></span>
+              </div>
+              <div class="item" data-value="de">
+                <img src="/public/flags/de.svg" alt="flag" />
+                <span><%= __("German") %></span>
+              </div>
+              <div class="item" data-value="it">
+                <img src="/public/flags/it.svg" alt="flag" />
+                <span><%= __("Italian") %></span>
+              </div>
+              <div class="item" data-value="pt">
+                <img src="/public/flags/pt.svg" alt="flag" />
+                <span><%= __("Portuguese") %></span>
+              </div>
+              <div class="item" data-value="es">
+                <img src="/public/flags/es.svg" alt="flag" />
+                <span><%= __("Spanish") %></span>
+              </div>
+              <div class="item" data-value="tr">
+                <img src="/public/flags/tr.svg" alt="flag" />
+                <span><%= __("Turkish") %></span>
+              </div>
+            </div>
+          </div>
+          <div class="max-500">
+            <form id="loginForm" novalidate>
+              <div class="title txt-center"><%= __('welcome_back') %></div>
+              <div class="sub mb-3 txt-center"><%= __('login_title') %></div>
+
+              <div class="mb-3">
+                <input
+                  type="email"
+                  id="email"
+                  placeholder="<%= __('email') %>"
+                  required
+                />
+              </div>
+
+              <div class="mb-2 hasPass">
+                <div class="showPass">
+                  <img src="/public/images/icons/visibility.svg" alt="eye" />
+                </div>
+                <input
+                  type="password"
+                  id="password"
+                  placeholder="<%= __('password') %>"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <a href="/forgot-password"><%= __('forgot_password') %></a>
+              </div>
+
+              <button
+                type="submit"
+                id="loginButton"
+                class="butn butn-primary mb-3 w-100"
+              >
+                <%= __('login') %>
+              </button>
+
+              <p>
+                <%= __('dont_have_account') %>
+                <a href="/signup"><%= __('signup') %></a>
+              </p>
+            </form>
+          </div>
+        </div>
+        <div class="bg">
+          <img src="/public/images/authLoginBg.webp" alt="authBg" />
+        </div>
+      </div>
+    </main>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"
+      integrity="sha512-DdX/YwF5e41Ok+AI81HI8f5/5UsoxCVT9GKYZRIzpLxb8Twz4ZwPPX+jQMwMhNQ9b5+zDEefc+dcvQoPWGNZ3g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="/public/js/languageSwitcher.js"></script>
+    <script src="/public/js/config.js"></script>
+    <script>
+      const API_URL = apiBaseUrl;
+      document.addEventListener("DOMContentLoaded", function () {
+        const passwordInput = document.getElementById("password");
+        const showPassIcon = document.querySelector(".showPass img");
+
+        document
+          .querySelector(".showPass")
+          .addEventListener("click", function () {
+            // Toggle password visibility
+            passwordInput.type = "text";
+            showPassIcon.src = "/public/images/icons/visibility_off.svg"; // Change icon to "visibility off"
+
+            // Revert to hidden password after 3 seconds
+            setTimeout(function () {
+              passwordInput.type = "password";
+              showPassIcon.src = "/public/images/icons/visibility.svg"; // Change icon back to "visibility"
+            }, 3000);
+          });
+        const loginForm = document.getElementById("loginForm");
+        const loginButton = document.getElementById("loginButton");
+        const emailInput = document.getElementById("email");
+        const subDiv = document.querySelector(".sub");
+        // Email validation function
+        function validateEmail(email) {
+          const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          return regex.test(email);
+        }
+
+        // Function to show a top error message above the form inputs
+        function showTopError(message) {
+          clearTopError(); // Clear any existing top error message
+
+          const errorDiv = document.createElement("div");
+          errorDiv.className = "form-alert error";
+          errorDiv.textContent = message;
+
+          // Insert the error message below the .sub div (top of the form)
+          subDiv.insertAdjacentElement("afterend", errorDiv);
+        }
+
+        // Function to clear any existing top error message
+        function clearTopError() {
+          const existingError = document.querySelector(".form-alert.error");
+          if (existingError) existingError.remove();
+        }
+        // Function to show a field-specific error message below the input
+        function showFieldError(inputElement, message) {
+          clearFieldError(inputElement);
+
+          const errorDiv = document.createElement("div");
+          errorDiv.className = "form-alert error";
+          errorDiv.textContent = message;
+          inputElement.parentNode.appendChild(errorDiv);
+        }
+
+        // Function to clear a field-specific error message
+        function clearFieldError(inputElement) {
+          const existingError =
+            inputElement.parentNode.querySelector(".form-alert.error");
+          if (existingError) existingError.remove();
+        }
+
+        // Function to validate individual fields
+        function validateField(inputElement) {
+          if (inputElement === emailInput) {
+            if (!emailInput.value) {
+              showFieldError(emailInput, "<%= __('email_required') %>");
+            } else if (!validateEmail(emailInput.value)) {
+              showFieldError(emailInput, "<%= __('invalid_email') %>");
+            } else {
+              clearFieldError(emailInput);
+            }
+          } else if (inputElement === passwordInput) {
+            if (!passwordInput.value) {
+              showFieldError(passwordInput, "<%= __('password_required') %>");
+            } else {
+              clearFieldError(passwordInput);
+            }
+          }
+        }
+
+        // Form submission validation
+        function validateForm() {
+          let isValid = true;
+
+          if (!validateEmail(emailInput.value)) {
+            showFieldError(emailInput, "<%= __('invalid_email') %>");
+            isValid = false;
+          } else {
+            clearFieldError(emailInput);
+          }
+
+          if (!passwordInput.value) {
+            showFieldError(passwordInput, "<%= __('password_required') %>");
+            isValid = false;
+          } else {
+            clearFieldError(passwordInput);
+          }
+
+          return isValid;
+        }
+
+        // Map the API error messages to your translated strings rendered via EJS
+        function translateApiError(apiMessage) {
+          const translations = {
+            "Incorrect password": "<%= __('incorrect_password') %>",
+            "User not found": "<%= __('user_not_found') %>",
+          };
+          // Return the translation if it exists, otherwise a fallback translation
+          return translations[apiMessage] || "<%= __('login_failed') %>";
+        }
+
+        // Form submission handler
+        loginForm.addEventListener("submit", function (event) {
+          event.preventDefault(); // Prevent default form submission
+
+          // Check if form is valid
+          if (validateForm()) {
+            // If form is valid, proceed with submission
+            loginButton.textContent = "<%= __('loading') %>";
+
+            // Perform the login request (assuming you have an axios function defined)
+            axios
+              .post(
+                `${API_URL}/auth/login`,
+                {
+                  email: emailInput.value,
+                  password: passwordInput.value,
+                },
+                { withCredentials: true }
+              )
+              .then((response) => {
+                document.cookie = `token=${response.data.token}; path=/; max-age=86400000`;
+                window.location.href = "/dashboard"; // Redirect to protected route
+              })
+              .catch((error) => {
+                const apiMessage =
+                  error.response && error.response.data.message
+                    ? error.response.data.message
+                    : null;
+                const localizedMessage = translateApiError(apiMessage);
+                showTopError(localizedMessage);
+              })
+              .finally(() => {
+                loginButton.textContent = "<%= __('login') %>";
+              });
+          }
+        });
+
+        // Real-time validation on blur
+        emailInput.addEventListener("blur", function () {
+          validateField(emailInput);
+        });
+
+        passwordInput.addEventListener("blur", function () {
+          validateField(passwordInput);
+        });
+      });
+    </script>
+  </body>
+</html>

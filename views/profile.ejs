@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="/public/images/linkhub-icon.png"
+      type="image/x-icon"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css"
+      rel="stylesheet"
+    />
+    <title><%= user.profileName %> | Link234</title>
+    <link rel="stylesheet" href="/public/style/theme.css" />
+  </head>
+  <body>
+    <main style="background-color: #eff3f6; min-height: 100vh">
+      <div class="layout">
+        <div class="profile-wrapper">
+          <div class="profile_top">
+            <div class="p-cover">
+              <% if (!user.coverImage || user.coverImage.trim() === "") { %>
+              <!-- Render this if coverImage is empty or does not exist -->
+              <div class="empty">
+                <img
+                  style="border: solid 6px #fff"
+                  src="/public/images/c-holder.png"
+                  alt="cover image"
+                />
+              </div>
+              <% } else { %>
+              <!-- Render this if coverImage exists -->
+              <div class="hasCover">
+                <img
+                  src="<%= staticBaseUrl %><%= user.coverImage %>"
+                  alt="Cover Image"
+                />
+              </div>
+              <% } %>
+            </div>
+            <div class="p-dp">
+              <% if (!user.profileImage || user.profileImage.trim() === "") { %>
+              <div class="empty">
+                <img src="/public/images/p-holder.png" alt="profile image" />
+              </div>
+              <% } else { %>
+              <div class="hasPImage">
+                <img
+                  src="<%= staticBaseUrl %><%= user.profileImage %>"
+                  alt="profile image"
+                />
+              </div>
+
+              <% } %>
+            </div>
+            <div class="px-3 p-name"><%-user.profileName%></div>
+            <div class="px-3 p-username">
+              <%-__('account_type')%>: <span><%-user.type%></span>
+            </div>
+            <div class="px-3 p-link">@<%-user.username%></div>
+
+            <div class="px-3 contact">
+              <% if(user.phoneNumber != ''){%>
+
+              <a href="tel:<%-user.phoneNumber%>">
+                <div class="item">
+                  <img
+                    style="height: 42px"
+                    src="/public/images/icons/phone.svg"
+                    alt="phone"
+                  />
+                </div>
+              </a>
+              <% }%>
+
+              <a target="_blank" href="mailto:<%-user.email%>">
+                <div class="item">
+                  <img src="/public/images/icons/email.svg" alt="phone" />
+                </div>
+              </a>
+              <% if(user.address && (user.address.houseNo || user.address.street
+              || user.address.city || user.address.postcode ||
+              user.address.country)) { %>
+              <a
+                class="location-link"
+                target="_blank"
+                href="https://www.google.com/maps/search/?api=1&query=<%- encodeURIComponent(`${user.address.houseNo || ''} ${user.address.street || ''}, ${user.address.city || ''}, ${user.address.postcode || ''}, ${user.address.country || ''}`) %>"
+              >
+                <div class="item">
+                  <img
+                    style="height: 35px"
+                    src="/public/images/icons/pin.svg"
+                    alt="location pin"
+                  />
+                </div>
+              </a>
+              <% } %>
+            </div>
+
+            <% if (user && user.socialLinks &&
+            Object.values(user.socialLinks).some(link => link)) { %>
+            <div class="px-3 social-icons-to-add" style="margin-bottom: 2rem">
+              <% Object.entries(user.socialLinks).forEach(([key, value]) => { %>
+              <% if (value) { %>
+              <a href="<%= value %>" target="_blank" rel="noopener noreferrer">
+                <div class="item" data-key="<%= key %>">
+                  <img
+                    src="/public/images/icons/<%= key %>.svg"
+                    alt="<%= key %>"
+                  />
+                  <!-- <div class="t"><%= key %></div> -->
+                </div>
+              </a>
+              <% } %> <% }); %>
+            </div>
+            <% } %>
+          </div>
+          <% const aboutHtml = user.aboutUs || ""; const cleanedAbout =
+          aboutHtml.replace(/<[^>]+>/g, '').trim(); %> <% if
+          (cleanedAbout.length > 0) { %>
+          <div class="profile_holder">
+            <div
+              class="title-xs mb-3"
+              style="text-decoration: underline; color: #666565"
+            >
+              <%- __('about') %>
+            </div>
+            <div class="p-about"><%- aboutHtml %></div>
+          </div>
+          <% } %>
+
+          <!-- additional links -->
+          <% if (user && user.additionalLinks && user.additionalLinks.length >
+          0) { %>
+          <div class="profile_holder">
+            <div
+              class="title-xs mb-3"
+              style="text-decoration: underline; color: #666565"
+            >
+              Additional links
+            </div>
+            <div class="dfac px-3 flex-wrap jc-center">
+              <% user.additionalLinks.forEach((link) => { %>
+              <a
+                href="<%= link.link %>"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div class="item-addtionalLinks">
+                  <div class="title"><%-link.title%></div>
+                </div>
+              </a>
+              <% }) %>
+            </div>
+          </div>
+          <% } %>
+
+          <!-- catalogues -->
+
+          <div class="p-flex-col mb-4">
+            <% if (user && user.catelogue && user.catelogue.length > 0) { %>
+            <div
+              class="title-xs mb-3"
+              style="
+                margin-top: 2.5rem;
+                text-decoration: underline;
+                color: #666565;
+              "
+            >
+              <%= __('catalogues') %>
+            </div>
+            <% user.catelogue.forEach((catelogue) => { %>
+            <div class="c-item">
+              <div>
+                <div class="title-xs"><%- catelogue.title %></div>
+                <div class="desc"><%- catelogue.description %></div>
+              </div>
+              <div class="view-file">
+                <a
+                  class="butn butn-primary butn-sm"
+                  target="_blank"
+                  href="<%= staticBaseUrl %>/<%- catelogue.file %>"
+                  ><%= __('view_file') %></a
+                >
+              </div>
+            </div>
+            <% }) %> <% } else { %> <% } %>
+          </div>
+
+          <div
+            class="url share-link butn butn-secondary"
+            data-value="https:link234.com/<%- user.username%>"
+          >
+            Share this profile
+          </div>
+          <div class="mt-3 mb-4">
+            <a href="/"><%-__('create_your_link')%></a>
+          </div>
+          <!-- wrapper ends -->
+        </div>
+      </div>
+    </main>
+    <%- include('partials/footer') %>
+    <!-- javascript -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"
+      integrity="sha512-DdX/YwF5e41Ok+AI81HI8f5/5UsoxCVT9GKYZRIzpLxb8Twz4ZwPPX+jQMwMhNQ9b5+zDEefc+dcvQoPWGNZ3g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4ijUxSISsbNS29gjv8onur04fqQ8zets&libraries=places"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/public/js/languageSwitcher.js"></script>
+    <script src="/public/js/config.js"></script>
+    <script src="/public/js/theme.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const locationLink = document.querySelector(".location-link");
+
+        if (locationLink) {
+          // Extract the encoded address from the existing href
+          const address = locationLink.href.split("query=")[1];
+
+          // Detect the user's platform
+          const userAgent =
+            navigator.userAgent || navigator.vendor || window.opera;
+
+          if (/android/i.test(userAgent)) {
+            // Android: Use geo: URI scheme
+            locationLink.href = `geo:0,0?q=${address}`;
+          } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+            // iOS: Use Apple Maps
+            locationLink.href = `https://maps.apple.com/?q=${decodeURIComponent(
+              address
+            )}`;
+          } else {
+            // Default to Google Maps
+            locationLink.href = `https://www.google.com/maps/search/?api=1&query=${address}`;
+          }
+        }
+
+        // Select all elements with the class "desc"
+        const descriptions = document.querySelectorAll(".desc");
+
+        descriptions.forEach((desc) => {
+          // Create a temporary DOM element to safely parse the HTML
+          const tempDiv = document.createElement("div");
+          tempDiv.innerHTML = desc.innerHTML;
+
+          // Find all elements within the parsed HTML
+          tempDiv.querySelectorAll("*").forEach((el) => {
+            el.removeAttribute("style"); // Remove the style attribute
+          });
+
+          // Replace the original HTML with the sanitized HTML
+          desc.innerHTML = tempDiv.innerHTML;
+        });
+
+        const shareLinkElement = document.querySelector(".share-link");
+
+        if (shareLinkElement) {
+          shareLinkElement.addEventListener("click", () => {
+            const urlToCopy = shareLinkElement.getAttribute("data-value");
+
+            // Copy the URL to the clipboard
+            navigator.clipboard
+              .writeText(urlToCopy)
+              .then(() => {
+                // Temporarily replace the content with "Link Copied"
+                const originalContent = shareLinkElement.innerHTML;
+                shareLinkElement.innerHTML = "Link Copied!";
+
+                // Revert back to the original content after 2 seconds
+                setTimeout(() => {
+                  shareLinkElement.innerHTML = originalContent;
+                }, 2000);
+              })
+              .catch((err) => {
+                console.error("Failed to copy text:", err);
+              });
+          });
+        }
+      });
+    </script>
+    <script>
+      const API_URL = apiBaseUrl;
+      document.addEventListener("DOMContentLoaded", () => {
+        const newsletterForm = document.getElementById("newsletterForm");
+
+        if (!newsletterForm) return; // ✅ Exit if form does not exist (prevents errors)
+
+        const nameInput = document.getElementById("nl-name");
+        const emailInput = document.getElementById("nl-email");
+        const consentCheckbox = document.getElementById("consentCheckbox");
+        const alertDiv = document.getElementById("newsLettersAlert");
+
+        newsletterForm.addEventListener("submit", async (event) => {
+          event.preventDefault(); // Prevent default form submission
+
+          // Get form values
+          const fullName = nameInput.value.trim();
+          const email = emailInput.value.trim();
+          const consentGiven = consentCheckbox.checked;
+
+          // ✅ Validate all required fields
+          let errorMessage = "";
+          if (!fullName) {
+            errorMessage = "<%= __('full_name_required') %>"; // Add translation key for full name validation
+          } else if (!email) {
+            errorMessage = "<%= __('email_required') %>"; // Use existing email validation
+          } else if (!consentGiven) {
+            errorMessage = "<%= __('consent_required') %>"; // Custom message for consent
+          }
+
+          if (errorMessage) {
+            showAlert(errorMessage, "error");
+            return;
+          }
+
+          try {
+            const response = await axios.post(`${API_URL}/form/submit`, {
+              fullName,
+              email,
+              form_type: "newsletter",
+            });
+
+            showAlert("<%= __('newsletter_signup_success') %>", "success");
+            nameInput.value = "";
+            emailInput.value = "";
+          } catch (error) {
+            let errorMessage = error.message; //
+
+            if (error.response) {
+              const { message, errorType } = error.response.data;
+
+              // Handle different error cases based on errorType
+              if (errorType === "missing_fields") {
+                errorMessage = "Please fill in all required fields.";
+              } else if (errorType === "invalid_email") {
+                errorMessage =
+                  "Invalid email format. Please enter a valid email.";
+              } else if (errorType === "invalid_form_type") {
+                errorMessage = "Form type is incorrect.";
+              } else if (errorType === "server_error") {
+                errorMessage =
+                  "There was a problem processing your request. Try again.";
+              } else {
+                errorMessage = message; // Fallback to the default message from the server
+              }
+            }
+
+            showAlert(errorMessage, "error"); // ✅ Show detailed error message
+          }
+        });
+
+        // Function to display alerts
+        function showAlert(message, type) {
+          alertDiv.textContent = message;
+          alertDiv.className = `form-alert ${type}`; // Set success or error class
+          alertDiv.classList.remove("d-none");
+
+          // Hide alert after 5 seconds
+          setTimeout(() => {
+            alertDiv.classList.add("d-none");
+          }, 5000);
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,158 @@
+<header class="app-header">
+  <nav class="layout">
+    <div class="logo">
+      <img src="/public/images/logo-f1.svg" alt="Logo" />
+    </div>
+    <div class="menu_overlay"></div>
+    <div class="menu_burger">
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+    <div class="menu">
+      <div class="menu_close">+</div>
+      <div class="menu-links">
+        <div class="link-m">
+          <a
+            class="<%= (path == '/dashboard') ? 'active' : '' %>"
+            href="<%= (path == '/dashboard') ? 'javascript:void(0)' : '/dashboard' %>"
+            ><%-__('dashboard') %></a
+          >
+        </div>
+
+        <div class="link-m">
+          <a
+            class="<%= (path == '/links') ? 'active' : '' %>"
+            href="<%= (path == '/links') ? 'javascript:void(0)' : '/links' %>"
+            ><%-__('links')%></a
+          >
+        </div>
+        <div class="link-m">
+          <a
+            class="<%= (path == '/catalogue') ? 'active' : '' %>"
+            href="<%= (path == '/catalogue') ? 'javascript:void(0)' : '/catalogue' %>"
+            ><%-__('catalogue') %>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="languageSwitcher me-1">
+      <div class="toggle">
+        <img src="/public/flags/en.svg" alt="flag" />
+      </div>
+      <div class="dropdown">
+        <div class="item" data-value="en">
+          <img src="/public/flags/gb.svg" alt="flag" />
+          <span><%= __("English") %></span>
+        </div>
+        <div class="item" data-value="fr">
+          <img src="/public/flags/fr.svg" alt="flag" />
+          <span><%= __("French") %></span>
+        </div>
+        <div class="item" data-value="de">
+          <img src="/public/flags/de.svg" alt="flag" />
+          <span><%= __("German") %></span>
+        </div>
+        <div class="item" data-value="it">
+          <img src="/public/flags/it.svg" alt="flag" />
+          <span><%= __("Italian") %></span>
+        </div>
+        <div class="item" data-value="pt">
+          <img src="/public/flags/pt.svg" alt="flag" />
+          <span><%= __("Portuguese") %></span>
+        </div>
+        <div class="item" data-value="pl">
+          <img src="/public/flags/pl.svg" alt="flag" />
+          <span><%= __("Polish") %></span>
+        </div>
+        <div class="item" data-value="es">
+          <img src="/public/flags/es.svg" alt="flag" />
+          <span><%= __("Spanish") %></span>
+        </div>
+        <div class="item" data-value="tr">
+          <img src="/public/flags/tr.svg" alt="flag" />
+          <span><%= __("Turkish") %></span>
+        </div>
+      </div>
+    </div>
+    <div class="profile-menu">
+      <div class="p-menu-header">
+        <% if(!user.verified){ %>
+        <div class="notification"></div>
+        <% }%> <% if (!user.profileImage || user.profileImage.trim() === "") {
+        %>
+        <img src="/public/images/p-holder.png" alt="profile image" /> <% } else
+        { %>
+        <img
+          src="http://localhost:3000<%= user.profileImage %>"
+          alt="profile image"
+        />
+        <% } %>
+      </div>
+      <div class="p-menu-dd">
+        <div class="p-image">
+          <!--  -->
+          <% if (user.profileName) { %>
+          <div class="name"><%- user.profileName%></div>
+          <% } else { %>
+          <div class="name"><%- user.profileName%></div>
+          <% } %>
+          <div class="uname">@<%- user.username%></div>
+          <div
+            class="url copy-mylink"
+            data-value="http:localhost:3000/<%- user.username%>"
+          >
+            <img src="/public/images/icons/copy.svg" alt="copy" />
+            <%-__('my_link')%>: localhost:3000/<%- user.username%>
+          </div>
+        </div>
+        <div class="p-menu-links" onclick="myProfileLink()">
+          <%-__('my_profile')%>
+        </div>
+        <div class="p-menu-links" onclick="editProfileLink()">
+          <%-__('edit_profile')%>
+        </div>
+        <div class="p-menu-links" onclick="accountLink()">
+          <%-__('account')%> <% if(!user.verified){ %>
+          <div class="notification"></div>
+          <% }%>
+        </div>
+        <div class="p-menu-links qr-code">
+          <img src="http://localhost:3000<%-user.qrCodeSVG%>" alt="img" />
+          <div class="dfac" style="gap: 0.7rem">
+            <button
+              class="butn butn-trpnt butn-sm"
+              id="downloadSVG"
+              data-value="http://localhost:3000<%- user.qrCodeSVG %>"
+            >
+              <img src="/public/images/icons/download.svg" alt="Download" /> SVG
+            </button>
+            <button
+              class="butn butn-trpnt butn-sm"
+              id="downloadPNG"
+              data-value="http://localhost:3000<%- user.qrCodePNG %>"
+            >
+              <img src="/public/images/icons/download.svg" alt="Download" /> PNG
+            </button>
+          </div>
+        </div>
+
+        <button id="logoutButton" class="butn-primary butn">
+          <%-__('logout')%>
+        </button>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<script>
+  function myProfileLink() {
+    window.open("/<%- user.username%>", "_blank");
+  }
+  function editProfileLink() {
+    window.location.href = "/edit-profile";
+  }
+  function accountLink() {
+    window.location.href = "/account";
+  }
+</script>

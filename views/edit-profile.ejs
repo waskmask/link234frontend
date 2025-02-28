@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="/public/images/linkhub-icon.png"
+      type="image/x-icon"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css"
+      rel="stylesheet"
+    />
+    <title><%-__('edit_profile') %> | Link234</title>
+    <link rel="stylesheet" href="/public/style/theme.css" />
+  </head>
+  <body>
+    <%- include('partials/app-header') %>
+    <main>
+      <div class="layout" style="padding-bottom: 60px; padding-top: 65px;">
+        <div class="dashboard-wrapper">
+          <div class="page-header">
+            <div class="title"><%= __('edit_profile') %></div>
+          </div>
+          <div class="page-content">
+            <div class="grid-2">
+              <div class="profile-form" style="margin-bottom: 60px">
+                <form id="usernameForm">
+                  <div class="mb-3">
+                    <label for="username"><%= __('username') %></label>
+                    <div class="u-link-wrapper">
+                      <div class="username-link">https://linkhub.de/</div>
+                      <input
+                        type="text"
+                        id="username"
+                        placeholder="<%= __('username') %>"
+                        value="<%= user.username %>"
+                      />
+                    </div>
+                    <div id="username-helper" class="helper">
+                      <%= __('you_can_edit_username') %>
+                    </div>
+                  </div>
+                </form>
+                <% if (!user.profileName || user.profileName.trim() === "") { %>
+               
+                <div class="title-sm mb-3"><%= __('create_profile') %></div>
+                <div class="create-profile">
+                  <form id="newProfileForm">
+                    <div class="mb-3">
+                      <label for="type"><%- __('account_type') %></label>
+                      <select name="type" id="type" required>
+                        <option value="">Select</option>
+                        <option value="business"><%- __('business') %></option>
+                        <option value="private"><%- __('private') %></option>
+                        <option value="creator"><%- __('creator') %></option>
+                        <option value="influencer"><%- __('influencer') %></option>
+                        <option value="model"><%- __('model') %></option>
+                        <option value="musician"><%- __('musician') %></option>
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label for="profileName"><%- __('full_name') %></label>
+                      <input
+                        type="text"
+                        id="profileName"
+                        placeholder="<%- __('profile_name') %>"
+                        required maxlength="20"
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label for="about"><%- __('about') %></label>
+                      <div
+                        id="about"
+                        style="height: auto; min-height: 100px"
+                      ></div>
+                    </div>
+                    <div class="mb-3">
+                      <label for="phoneNumber"><%- __('phone_number_opt') %></label>
+                      <input
+                        type="number"
+                        id="phoneNumber"
+                        placeholder="<%- __('phone_inc_country_code') %>"
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label for="fullAddress"><%- __('address') %></label>
+                      <input
+                        type="text"
+                        id="fullAddress"
+                        placeholder="<%- __('start_tp_address') %>"
+                      />
+                      <input type="hidden" id="street" />
+                      <input type="hidden" id="houseNo" />
+                      <input type="hidden" id="city" />
+                      <input type="hidden" id="country" />
+                      <input type="hidden" id="postcode" />
+                    </div>
+                    <div id="newProfileAlert" class="form-alert mt-3 mb-4 success d-none">
+                      <%-__('profile_saved_success')%>  
+                    </div>
+                    <button type="submit" class="butn butn-primary w-100" style="margin-top: 20px;">
+                      <%-__('submit')%>  
+                    </button>
+                  </form>
+                </div>
+                <% } else {%>
+              
+                <div class="edit-profile">
+                  <form id="editProfileForm">
+                    <div class="mb-3">
+                      <label for="type"><%- __('account_type') %></label>
+                      <select name="type" id="type" required>
+                        <option value=""><%- __('select') %></option>
+                        <option value="business" <%= user.type === "business" ? "selected" : "" %>><%- __('business') %></option>
+                        <option value="private" <%= user.type === "private" ? "selected" : "" %>><%- __('private') %></option>
+                        <option value="creator" <%= user.type === "creator" ? "selected" : "" %>><%- __('creator') %></option>
+                        <option value="influencer" <%= user.type === "influencer" ? "selected" : "" %>><%- __('influencer') %></option>
+                        <option value="model" <%= user.type === "model" ? "selected" : "" %>> <%- __('model') %></option>
+                        <option value="musician" <%= user.type === "musician" ? "selected" : "" %>><%- __('musician') %></option>
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label for="profileName"><%- __('full_name') %></label>
+                      <input
+                        type="text"
+                        id="profileName"
+                        placeholder="<%- __('profile_name') %>"
+                        required maxlength="20"
+                        value="<%=user.profileName%>"
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label for="about"><%- __('about') %></label>
+                      <div id="about" style="height: auto; min-height: 100px">
+                        <%-user.aboutUs%>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label for="phoneNumber"><%- __('phone_number_opt') %></label>
+                      <input
+                        type="number"
+                        id="phoneNumber"
+                        placeholder="<%- __('phone_inc_country_code') %>"
+                        value="<%-user.phoneNumber%>"
+                      />
+                    </div>
+                    <% if(user.address && Object.values(user.address).some(value => value.trim() !== '')) { %>
+                      <label >Address</label>
+                      <div class="remove_address"> <%
+                        const { street, houseNo, postcode, city, country } = user.address || {};
+                        let addressParts = [];
+                      
+                        if (street) addressParts.push(street);
+                        if (houseNo) addressParts.push(houseNo);
+                        if (postcode) addressParts.push(postcode);
+                        if (city) addressParts.push(city);
+                        if (country) addressParts.push(country);
+                      %>
+                      <%- addressParts.length > 0 ? addressParts.join(', ') : '' %>
+                      </div>
+                      <button class="butn butn-delete butn-sm mb-4 mt-1" id="deleteAddress"><%-__('remove_address')%></button>
+                    <% } else {  %>
+                      <div class="mb-4">
+                        <%
+                        const { street, houseNo, postcode, city, country } = user.address || {};
+                        let addressParts = [];
+                      
+                        if (street) addressParts.push(street);
+                        if (houseNo) addressParts.push(houseNo);
+                        if (postcode) addressParts.push(postcode);
+                        if (city) addressParts.push(city);
+                        if (country) addressParts.push(country);
+                      %>
+                      <label for="fullAddress"><%-__('address_optional')%></label>
+                      <input
+                        type="text"
+                        id="fullAddress"
+                        placeholder="<%- __('start_tp_address') %>"
+                        value="<%- addressParts.length > 0 ? addressParts.join(', ') : '' %>"
+                      />
+                      
+                      <input type="hidden" id="street" value="<%- street || '' %>"/>
+                      <input type="hidden" id="houseNo" value="<%- houseNo || '' %>"/>
+                      <input type="hidden" id="city" value="<%- city || '' %>"/>
+                      <input type="hidden" id="country" value="<%- country || '' %>"/>
+                      <input type="hidden" id="postcode" value="<%- postcode || '' %>"/>
+                          
+                      </div>
+                      <% }%>
+                 
+                    <div id="editProfileAlert" class="form-alert success d-none">
+                      <%-__('profile_updated_success')%>
+                    </div>
+                    <button type="submit" class="butn butn-primary w-100" style="margin-top: 20px;">
+                      <%- __('submit') %>
+                    </button>
+                  </form>
+                </div>
+                <% }%>
+              </div>
+
+               
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <%- include('partials/app-footer') %>
+
+    <!-- javascript -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"
+      integrity="sha512-DdX/YwF5e41Ok+AI81HI8f5/5UsoxCVT9GKYZRIzpLxb8Twz4ZwPPX+jQMwMhNQ9b5+zDEefc+dcvQoPWGNZ3g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="/public/js/languageSwitcher.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4ijUxSISsbNS29gjv8onur04fqQ8zets&libraries=places"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/public/js/config.js"></script>
+    <script src="/public/js/theme.js"></script>
+    <script>
+      // var quill = new Quill("#about", {
+      //   modules: {
+      //     toolbar: false, // This hides the toolbar
+      //   },
+      //   placeholder: "About",
+      //   theme: "snow",
+      // });
+      const API_URL = apiBaseUrl;
+      document.addEventListener("DOMContentLoaded", function () {
+        const usernameForm = document.getElementById("usernameForm");
+        const usernameInput = document.getElementById("username");
+        const helperText = document.getElementById("username-helper");
+
+        const initialUsername = usernameInput.value.trim(); // Store the initial username to check for changes
+        let timeoutId = null;
+
+        // Set initial helper text
+        helperText.textContent = "<%= __('you_can_edit_username') %>";
+
+        // Listen for input events on the username field
+        usernameInput.addEventListener("input", (e) => {
+          const username = e.target.value.trim();
+
+          // If username is unchanged, reset helper text and classes
+          if (username === initialUsername) {
+            helperText.textContent = "<%= __('you_can_edit_username') %>";
+            helperText.classList.remove("error", "success");
+            return;
+          }
+
+          // Validate length and characters
+          if (!/^[a-zA-Z0-9_.]{3,20}$/.test(username)) {
+            helperText.textContent = "<%= __('username_validation') %>";
+            helperText.classList.remove("success");
+            helperText.classList.add("error");
+            return;
+          }
+
+          // If valid pattern, check availability after 3 characters
+          if (username.length >= 3) {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+              checkUsernameAvailability(username);
+            }, 500); // 500ms debounce
+          } else {
+            helperText.textContent =
+              "<%= __('username_character_validation') %>";
+            helperText.classList.remove("success");
+            helperText.classList.add("error");
+          }
+        });
+
+        // Function to check username availability
+        async function checkUsernameAvailability(username) {
+          try {
+            const response = await axios.get(
+              `${API_URL}/user/check-username/${username}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${document.cookie.replace(
+                    /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+                    "$1"
+                  )}`,
+                },
+              }
+            );
+
+            // Check if the username exists or not based on response
+            if (!response.data.exists) {
+              // username is available if 'exists' is false
+              helperText.textContent = "<%= __('username_available') %>";
+              helperText.classList.remove("error");
+              helperText.classList.add("success");
+            } else {
+              helperText.textContent = "<%= __('username_taken') %>";
+              helperText.classList.remove("success");
+              helperText.classList.add("error");
+            }
+          } catch (error) {
+            helperText.textContent = "<%= __('error_checking_username') %>";
+            helperText.classList.remove("success");
+            helperText.classList.add("error");
+          }
+        }
+
+        // Save username on blur if valid and changed
+        usernameInput.addEventListener("blur", async () => {
+          const username = usernameInput.value.trim();
+
+          // If the username hasn't changed, reset helper text and exit
+          if (username === initialUsername) {
+            helperText.textContent = "<%= __('you_can_edit_username') %>";
+            helperText.classList.remove("error", "success");
+            return;
+          }
+
+          // Validate length
+          if (username.length < 4 || username.length > 20) {
+            helperText.textContent =
+              "<%= __('username_character_validation') %>";
+            helperText.classList.remove("success");
+            helperText.classList.add("error");
+            return;
+          }
+
+          // Proceed to save if no error message is present
+          if (!helperText.classList.contains("error")) {
+            try {
+              const response = await axios.put(
+                `${API_URL}/user/edit-username`,
+                { newUsername: username },
+                {
+                  headers: {
+                    Authorization: `Bearer ${document.cookie.replace(
+                      /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+                      "$1"
+                    )}`,
+                  },
+                }
+              );
+              helperText.textContent = "<%= __('username_updated') %>";
+              helperText.classList.remove("error");
+              helperText.classList.add("success");
+            } catch (error) {
+              helperText.textContent = "<%= __('error_username_update') %>";
+              helperText.classList.remove("success");
+              helperText.classList.add("error");
+            }
+          }
+        });
+
+        // Prevent form submission if submit button is added
+        usernameForm.addEventListener("submit", (event) => {
+          event.preventDefault();
+        });
+
+        // editor
+      });
+    </script>
+
+<script>
+
+  // Reusable function for initializing Google Maps Autocomplete
+  function initAutocomplete() {
+    const fullAddressInput = document.getElementById("fullAddress");
+    if (!fullAddressInput) return;
+    const autocomplete = new google.maps.places.Autocomplete(fullAddressInput);
+    autocomplete.setFields(["address_components", "formatted_address"]);
+    autocomplete.addListener("place_changed", () => {
+      const place = autocomplete.getPlace();
+      let fullAddress = place.formatted_address;
+      let street = "";
+      let houseNo = "";
+      let city = "";
+      let country = "";
+      let postcode = "";
+      fullAddressInput.value = fullAddress;
+      place.address_components.forEach((component) => {
+        const types = component.types;
+        if (types.includes("street_number")) {
+          houseNo = component.long_name;
+        } else if (types.includes("route")) {
+          street = component.long_name;
+        } else if (types.includes("locality")) {
+          city = component.long_name;
+        } else if (types.includes("country")) {
+          country = component.long_name;
+        } else if (types.includes("postal_code")) {
+          postcode = component.long_name;
+        }
+      });
+      // Populate the hidden fields
+      const streetInput = document.getElementById("street");
+      const houseNoInput = document.getElementById("houseNo");
+      const cityInput = document.getElementById("city");
+      const countryInput = document.getElementById("country");
+      const postcodeInput = document.getElementById("postcode");
+      if (streetInput) streetInput.value = street;
+      if (houseNoInput) houseNoInput.value = houseNo;
+      if (cityInput) cityInput.value = city;
+      if (countryInput) countryInput.value = country;
+      if (postcodeInput) postcodeInput.value = postcode;
+    });
+  }
+  
+  // Reusable function to initialize the Quill editor
+  function initQuill(selector, initialContent = "", placeholder = "<%-__('write_something_quill')%>") {
+    const quill = new Quill(selector, {
+      theme: "snow",
+      placeholder: placeholder,
+      modules: {
+        toolbar: false,
+      },
+    });
+    // quill.root.innerHTML = initialContent;
+    return quill;
+  }
+  
+  // Reusable function to display alert messages
+  function displayAlert(alertBox, message, type) {
+    if (!alertBox) return;
+    alertBox.textContent = message;
+    alertBox.classList.remove("d-none", "success", "error");
+    alertBox.classList.add(type);
+  }
+  
+  // Reusable function to collect address data from hidden fields
+  function getAddressFromFields() {
+    const fullAddressInput = document.getElementById("fullAddress");
+    let address = {};
+    if (fullAddressInput) {
+      address = {
+        fullAddress: fullAddressInput.value,
+        street: document.getElementById("street").value,
+        houseNo: document.getElementById("houseNo").value,
+        city: document.getElementById("city").value,
+        country: document.getElementById("country").value,
+        postcode: document.getElementById("postcode").value,
+      };
+    }
+    return address;
+  }
+  
+  // Reusable function to extract the authorization token from cookies
+  function getAuthToken() {
+    return document.cookie.replace(
+      /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+      "$1"
+    );
+  }
+  
+  // Initialize form handlers on DOMContentLoaded
+  document.addEventListener("DOMContentLoaded", function() {
+    // New Profile Form
+    const newProfileForm = document.getElementById("newProfileForm");
+    if (newProfileForm) {
+      const newProfileAlert = document.getElementById("newProfileAlert");
+      // Initialize Autocomplete and Quill for the new profile form
+      initAutocomplete();
+      const quillNew = initQuill("#about", "", "<%-__('write_something_quill')%>");
+  
+      newProfileForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const profileName = document.getElementById("profileName").value.trim();
+        const type = document.getElementById("type").value;
+        const phoneNumber = document.getElementById("phoneNumber").value;
+        const aboutUs = quillNew.root.innerHTML;
+        const address = getAddressFromFields();
+  
+        // Basic client-side validation
+        if (!profileName || !type) {
+          displayAlert(newProfileAlert, "<%-__('profile_name_type_req')%>", "error");
+          return;
+        }
+  
+        try {
+          const token = getAuthToken();
+          const response = await axios.post(`${API_URL}/user/create-profile`, {
+            profileName,
+            type,
+            address,
+            phoneNumber,
+            aboutUs,
+          }, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+  
+          displayAlert(newProfileAlert, "<%-__('profile_saved_success')%>", "success");
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
+        } catch (error) {
+          const errorMessage = error.response?.data?.message || "<%-__('error_creating_profile')%>";
+          displayAlert(newProfileAlert, errorMessage, "error");
+        }
+      });
+    }
+  
+    // Edit Profile Form
+    const editProfileForm = document.getElementById("editProfileForm");
+    if (editProfileForm) {
+      const editProfileAlert = document.getElementById("editProfileAlert");
+      // Initialize Autocomplete and Quill for the edit profile form
+      initAutocomplete();
+      // Assuming the "about" element contains server-rendered initial content
+      const initialAboutContent = document.querySelector("#about").innerHTML || "";
+      const quillEdit = initQuill("#about", initialAboutContent, "<%-__('write_something_quill')%>");
+  
+      editProfileForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const profileName = document.getElementById("profileName").value.trim();
+        const type = document.getElementById("type").value;
+        const phoneNumber = document.getElementById("phoneNumber").value;
+        const aboutUs = quillEdit.root.innerHTML;
+        const address = getAddressFromFields();
+  
+        // Basic client-side validation
+        if (!profileName || !type) {
+          displayAlert(editProfileAlert, "<%-__('profile_name_type_req')%>", "error");
+          return;
+        }
+ 
+        try {
+          const token = getAuthToken();
+          const response = await axios.put(`${API_URL}/user/edit-profile`, {
+            profileName,
+            type,
+            address,
+            phoneNumber,
+            aboutUs,
+          }, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+  
+          displayAlert(editProfileAlert, "<%-__('profile_updated_success')%>", "success");
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
+        } catch (error) {
+          const errorMessage = error.response?.data?.message || "<%-__('error_editing_profile')%>";
+          displayAlert(editProfileAlert, errorMessage, "error");
+        }
+      });
+    }
+  
+    // Delete Address Button Handler
+    const deleteAddressBtn = document.getElementById("deleteAddress");
+    if (deleteAddressBtn) {
+      deleteAddressBtn.addEventListener("click", async (event) => {
+        event.preventDefault();
+        const result = await Swal.fire({
+          title: "<%-__('delete_address')%>?",
+          text: "<%-__('sure_delete_address')%>",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "<%-__('yes_delete_it')%>",
+          cancelButtonText: "<%-__('cancel')%>",
+        });
+  
+        if (result.isConfirmed) {
+          try {
+            const token = getAuthToken();
+            const response = await axios.delete(`${API_URL}/user/user/delete-address`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+  
+            if (response.status === 200) {
+              Swal.fire({
+                title: "<%-__('deleted')%>!",
+                text: "<%-__('address_deleted')%>",
+                icon: "success",
+              });
+              setTimeout(() => {
+                window.location.reload();
+              }, 1500);
+            }
+          } catch (error) {
+            Swal.fire({
+              title: "<%-__('error')%>!",
+              text: error.response?.data?.message || "<%-__('fail_delete_address')%>",
+              icon: "error",
+            });
+          }
+        }
+      });
+    }
+  });
+</script>
+
+  </body>
+</html>

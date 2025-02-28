@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="/public/images/linkhub-icon.png"
+      type="image/x-icon"
+    />
+    <title>Link234 - <%-__('subtitle') %></title>
+    <link rel="stylesheet" href="/public/style/theme.css" />
+  </head>
+  <body>
+    <%- include('partials/header') %>
+    <main>
+      <section class="content" style="margin-top: 65px">
+        <div class="layout">
+          <% if (showPrivacyLangNotice) { %>
+          <div class="languageNotice light mb-3"><%= __("langNotice") %></div>
+          <% } %>
+          <div class="title-c mb-2">Imprint</div>
+
+          <div class="title-s mt-3 mb-1">Information According to § 5 TMG</div>
+          <p>
+            Web Hive UG<br />
+            Fritz-Erler-Straße 7<br />
+            63456 Hanau
+          </p>
+          <p>
+            Commercial Register: HRB 98089<br />
+            Registration Court: Amtsgericht Hanau
+          </p>
+          <p>
+            <strong>Represented By:</strong><br />
+            Abdul Waseem Mohammed
+          </p>
+
+          <div class="title-s mt-3 mb-1">Contact</div>
+          <p>
+            Phone: 06181 304 788 0<br />
+            Email: hallo@betterorder.de
+          </p>
+
+          <div class="title-s mt-3 mb-1">VAT ID</div>
+          <p>
+            VAT Identification Number according to § 27 a of the VAT Act:<br />
+            019 248 10113
+          </p>
+
+          <div class="title-s mt-3 mb-1">EU Dispute Resolution</div>
+          <p>
+            The European Commission provides a platform for online dispute
+            resolution (ODR):
+            <a
+              href="https://ec.europa.eu/consumers/odr/"
+              target="_blank"
+              rel="noopener noreferrer"
+              >https://ec.europa.eu/consumers/odr/</a
+            >.<br />
+            Our email address can be found above in the contact information.
+          </p>
+
+          <div class="title-s mt-3 mb-1">
+            Consumer Dispute Resolution/Universal Mediation Body
+          </div>
+          <p>
+            We are not obligated nor willing to participate in dispute
+            resolution proceedings before a consumer arbitration board.
+          </p>
+
+          <!-- end -->
+        </div>
+      </section>
+    </main>
+    <%- include('partials/footer') %>
+    <script src="/public/js/theme.js"></script>
+    <script src="/public/js/languageSwitcher.js"></script>
+
+    <script>
+      function toMemeberships() {
+        // Check if the current pathname is the homepage
+        if (window.location.pathname === "/") {
+          // Find the memberships section by its id
+          const membershipsSection = document.getElementById("memberships");
+          if (membershipsSection) {
+            // Smooth scroll to the memberships section
+            membershipsSection.scrollIntoView({ behavior: "smooth" });
+          }
+        } else {
+          // Redirect to the homepage with the hash to scroll to the memberships section
+          window.location.href = "/#memberships";
+        }
+      }
+      function toPrivacy() {
+        window.location.href = "/privacy";
+      }
+      function toContact() {
+        window.location.href = "/contact";
+      }
+      function toCompany() {
+        window.location.href = "/company";
+      }
+      function toTerms() {
+        window.location.href = "/terms";
+      }
+      function toHome() {
+        window.location.href = "/";
+      }
+    </script>
+    <script src="/public/js/config.js"></script>
+    <script>
+      const API_URL = apiBaseUrl;
+      document.addEventListener("DOMContentLoaded", () => {
+        const newsletterForm = document.getElementById("newsletterForm");
+
+        if (!newsletterForm) return; // ✅ Exit if form does not exist (prevents errors)
+
+        const nameInput = document.getElementById("nl-name");
+        const emailInput = document.getElementById("nl-email");
+        const consentCheckbox = document.getElementById("consentCheckbox");
+        const alertDiv = document.getElementById("newsLettersAlert");
+
+        newsletterForm.addEventListener("submit", async (event) => {
+          event.preventDefault(); // Prevent default form submission
+
+          // Get form values
+          const fullName = nameInput.value.trim();
+          const email = emailInput.value.trim();
+          const consentGiven = consentCheckbox.checked;
+
+          // ✅ Validate all required fields
+          let errorMessage = "";
+          if (!fullName) {
+            errorMessage = "<%= __('full_name_required') %>"; // Add translation key for full name validation
+          } else if (!email) {
+            errorMessage = "<%= __('email_required') %>"; // Use existing email validation
+          } else if (!consentGiven) {
+            errorMessage = "<%= __('consent_required') %>"; // Custom message for consent
+          }
+
+          if (errorMessage) {
+            showAlert(errorMessage, "error");
+            return;
+          }
+
+          try {
+            const response = await axios.post(`${API_URL}/form/submit`, {
+              fullName,
+              email,
+              form_type: "newsletter",
+            });
+
+            showAlert("<%= __('newsletter_signup_success') %>", "success");
+            nameInput.value = "";
+            emailInput.value = "";
+          } catch (error) {
+            let errorMessage = error.message; //
+
+            if (error.response) {
+              const { message, errorType } = error.response.data;
+
+              // Handle different error cases based on errorType
+              if (errorType === "missing_fields") {
+                errorMessage = "Please fill in all required fields.";
+              } else if (errorType === "invalid_email") {
+                errorMessage =
+                  "Invalid email format. Please enter a valid email.";
+              } else if (errorType === "invalid_form_type") {
+                errorMessage = "Form type is incorrect.";
+              } else if (errorType === "server_error") {
+                errorMessage =
+                  "There was a problem processing your request. Try again.";
+              } else {
+                errorMessage = message; // Fallback to the default message from the server
+              }
+            }
+
+            showAlert(errorMessage, "error"); // ✅ Show detailed error message
+          }
+        });
+
+        // Function to display alerts
+        function showAlert(message, type) {
+          alertDiv.textContent = message;
+          alertDiv.className = `form-alert ${type}`; // Set success or error class
+          alertDiv.classList.remove("d-none");
+
+          // Hide alert after 5 seconds
+          setTimeout(() => {
+            alertDiv.classList.add("d-none");
+          }, 5000);
+        }
+      });
+    </script>
+  </body>
+</html>
