@@ -84,7 +84,7 @@
         <img src="/public/images/p-holder.png" alt="profile image" /> <% } else
         { %>
         <img
-          src="http://localhost:3000<%= user.profileImage %>"
+          src="<%=staticBaseUrl%><%= user.profileImage %>"
           alt="profile image"
         />
         <% } %>
@@ -100,10 +100,10 @@
           <div class="uname">@<%- user.username%></div>
           <div
             class="url copy-mylink"
-            data-value="http:localhost:3000/<%- user.username%>"
+            data-value="https://link234.com/<%- user.username%>"
           >
             <img src="/public/images/icons/copy.svg" alt="copy" />
-            <%-__('my_link')%>: localhost:3000/<%- user.username%>
+            <%-__('my_link')%>: https://link234.com/<%- user.username%>
           </div>
         </div>
         <div class="p-menu-links" onclick="myProfileLink()">
