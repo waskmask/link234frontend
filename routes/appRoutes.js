@@ -99,7 +99,11 @@ router.get(
 
       // Pass the retrieved user data to the dashboard view
       const user = response.data.user;
-      res.render("edit-profile", { user: req.user, path: "/profile" });
+      res.render("edit-profile", {
+        user: req.user,
+        path: "/profile",
+        staticBaseUrl,
+      });
       console.log(user);
     } catch (error) {
       res
