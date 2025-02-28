@@ -100,10 +100,10 @@
           <div class="uname">@<%- user.username%></div>
           <div
             class="url copy-mylink"
-            data-value="https://link234.com/<%- user.username%>"
+            data-value="<%=staticBaseUrl%>/<%- user.username%>"
           >
             <img src="/public/images/icons/copy.svg" alt="copy" />
-            <%-__('my_link')%>: https://link234.com/<%- user.username%>
+            <%-__('my_link')%>: <%-staticBaseUrl%>/<%- user.username%>
           </div>
         </div>
         <div class="p-menu-links" onclick="myProfileLink()">
@@ -118,19 +118,19 @@
           <% }%>
         </div>
         <div class="p-menu-links qr-code">
-          <img src="http://localhost:3000<%-user.qrCodeSVG%>" alt="img" />
+          <img src="<%=staticBaseUrl%><%-user.qrCodeSVG%>" alt="img" />
           <div class="dfac" style="gap: 0.7rem">
             <button
               class="butn butn-trpnt butn-sm"
               id="downloadSVG"
-              data-value="http://localhost:3000<%- user.qrCodeSVG %>"
+              data-value="<%=staticBaseUrl%><%- user.qrCodeSVG %>"
             >
               <img src="/public/images/icons/download.svg" alt="Download" /> SVG
             </button>
             <button
               class="butn butn-trpnt butn-sm"
               id="downloadPNG"
-              data-value="http://localhost:3000<%- user.qrCodePNG %>"
+              data-value="<%=staticBaseUrl%><%- user.qrCodePNG %>"
             >
               <img src="/public/images/icons/download.svg" alt="Download" /> PNG
             </button>
