@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
       /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
       "$1"
     );
-
+    // new change
     try {
       // Fetch the file as a blob
       const response = await fetch(url, {
