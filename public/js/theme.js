@@ -87,36 +87,42 @@ document.addEventListener("DOMContentLoaded", () => {
       /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
       "$1"
     );
-    // new change
+    // Extract the filename from the URL
+    const urlParts = url.split("/");
+    const filename = urlParts[urlParts.length - 1];
+
+    // Construct the API endpoint URL with the dynamic filename query parameter
+    // const downloadUrl = `http://localhost:3000/api/download?filename=${encodeURIComponent(
+    //   filename
+    // )}`;
+    const downloadUrl = `https://api.link234.com/api/download?filename=${encodeURIComponent(
+      filename
+    )}`;
     try {
-      // Fetch the file as a blob
-      const response = await fetch(url, {
+      // Fetch the file from your API as a blob
+      const response = await fetch(downloadUrl, {
         method: "GET",
-        mode: "cors", // or 'no-cors', but that won't allow reading the response
-        credentials: "include", // if you need cookies
+        // If you're serving this endpoint from the same domain, mode can be omitted.
+        mode: "cors",
+        credentials: "include", // include cookies if required
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
       if (!response.ok) {
         throw new Error("Failed to fetch file.");
       }
       const blob = await response.blob();
 
-      // Extract the filename from the URL
-      const urlParts = url.split("/");
-      const filename = urlParts[urlParts.length - 1];
-
       // Create a temporary object URL for the blob
       const objectURL = URL.createObjectURL(blob);
 
-      // Create a temporary anchor element
+      // Create a temporary anchor element to trigger the download
       const anchor = document.createElement("a");
       anchor.href = objectURL;
-      anchor.download = filename; // Use the original filename
+      anchor.download = filename; // Set the download attribute to the filename
       document.body.appendChild(anchor); // Append to the DOM
-      anchor.click(); // Trigger download
+      anchor.click(); // Trigger the download
       document.body.removeChild(anchor); // Remove the anchor element
 
       // Revoke the object URL to free memory
@@ -130,14 +136,14 @@ document.addEventListener("DOMContentLoaded", () => {
   if (downloadSVGButton) {
     downloadSVGButton.addEventListener("click", () => {
       const url = downloadSVGButton.getAttribute("data-value");
-      downloadImage(url); // Download the SVG
+      downloadImage(url); // Download the SVG using the API endpoint
     });
   }
 
   if (downloadPNGButton) {
     downloadPNGButton.addEventListener("click", () => {
       const url = downloadPNGButton.getAttribute("data-value");
-      downloadImage(url); // Download the PNG
+      downloadImage(url); // Download the PNG using the API endpoint
     });
   }
 
