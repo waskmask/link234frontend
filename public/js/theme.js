@@ -83,9 +83,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Download function
   const downloadImage = async (url) => {
+    const token = document.cookie.replace(
+      /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+      "$1"
+    );
+
     try {
       // Fetch the file as a blob
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        method: "GET",
+        mode: "cors", // or 'no-cors', but that won't allow reading the response
+        credentials: "include", // if you need cookies
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       if (!response.ok) {
         throw new Error("Failed to fetch file.");
       }
