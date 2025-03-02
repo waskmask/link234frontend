@@ -268,7 +268,7 @@
   "page_not_found": "Pagina non trovata",
   "oops": "Ops...",
   "something_went_wrong": "Qualcosa è andato storto. Riprova più tardi.",
-  "password_requirements": "La password deve essere lunga almeno 8 caratteri e contenere almeno una lettera maiuscola, una minuscola, un numero e un carattere speciale",
+  "password_requirements": "La password deve contenere da 6 a 12 caratteri.",
   "passwords_do_not_match": "Le password non corrispondono",
   "email_exists": "L'email esiste già",
   "email_not_found": "Email non trovata",

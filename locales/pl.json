@@ -268,7 +268,7 @@
   "page_not_found": "Strona nie znaleziona",
   "oops": "Ups...",
   "something_went_wrong": "Coś poszło nie tak. Proszę spróbować później.",
-  "password_requirements": "Hasło musi mieć co najmniej 8 znaków, zawierać co najmniej jedną dużą literę, jedną małą literę, jedną cyfrę i jeden znak specjalny",
+  "password_requirements": "Hasło musi mieć od 6 do 12 znaków.",
   "passwords_do_not_match": "Hasła nie są zgodne",
   "email_exists": "E-mail już istnieje",
   "email_not_found": "E-mail nie został znaleziony",

@@ -21,7 +21,10 @@
               <div class="col">
                 <div class="title"><%- __('hero.title') %></div>
                 <div class="sub mt-3"><%- __('hero.subtext') %></div>
-                <button class="butn butn-xl butn-secondary mt-4">
+                <button
+                  class="butn butn-xl butn-secondary mt-4"
+                  onclick="toSignup()"
+                >
                   <%- __('hero.button') %>
                 </button>
               </div>
@@ -54,7 +57,10 @@
               <div class="col">
                 <div class="title"><%- __('Catalogue.title') %></div>
                 <div class="sub mt-3"><%- __('Catalogue.subtext') %></div>
-                <button class="butn butn-xl butn-secondary mt-4">
+                <button
+                  class="butn butn-xl butn-secondary mt-4"
+                  onclick="toSignup()"
+                >
                   <%- __('Catalogue.button') %>
                 </button>
               </div>
@@ -105,7 +111,7 @@
             <%- __('visibility.title') %>
           </div>
           <div class="dfjc mt-4">
-            <button class="butn butn-xl butn-secondary">
+            <button class="butn butn-xl butn-secondary" onclick="toSignup()">
               <%- __('visibility.button') %>
             </button>
           </div>
@@ -148,7 +154,7 @@
                 <div class="sm"><%- __('membership.basic.price_label') %></div>
                 <div class="price"><%- __('membership.basic.price') %></div>
                 <div class="p-c"><%- __('membership.basic.billing') %></div>
-                <button class="butn butn-secondary mt-4">
+                <button class="butn butn-secondary mt-4" onclick="toSignup()">
                   <%- __('membership.basic.button') %>
                 </button>
               </div>
@@ -212,6 +218,9 @@
           // Redirect to the homepage with the hash to scroll to the memberships section
           window.location.href = "/#memberships";
         }
+      }
+      function toSignup() {
+        window.location.href = "/signup";
       }
       function toPrivacy() {
         window.location.href = "/privacy";
