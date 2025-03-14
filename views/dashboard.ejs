@@ -430,53 +430,169 @@
         const profileImageForm = document.getElementById("profileImageForm");
 
         if (uploadPButton) {
-          // Trigger file input on upload button click
           uploadPButton.addEventListener("click", () => {
-            profileImageInput.click(); // Simulate click on hidden file input
+            profileImageInput.click();
           });
         }
 
         if (profileImageForm) {
-          // Handle file selection
-          profileImageInput.addEventListener("change", async () => {
-            if (profileImageInput.files && profileImageInput.files.length > 0) {
-              const formData = new FormData(profileImageForm);
-              try {
-                const response = await axios.post(
-                  `${API_URL}/user/upload/profile-image`,
-                  formData,
-                  {
-                    headers: {
-                      Authorization: `Bearer ${document.cookie.replace(
-                        /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
-                        "$1"
-                      )}`,
-                      "Content-Type": "multipart/form-data",
-                    },
-                  }
-                );
+          profileImageInput.addEventListener("change", async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
 
-                // Show success message and reload the page
-                Swal.fire({
-                  icon: "success",
-                  title: "<%- __('successTitle')%>",
-                  text: "<%- __('successProfileUpload')%>",
-                }).then(() => {
-                  window.location.reload();
-                });
-              } catch (error) {
-                // Show error message
-                Swal.fire({
-                  icon: "error",
-                  title: "Error!",
-                  text:
-                    error.response?.data?.message ||
-                    "<%- __('errorProfileUpload')%>",
-                });
-              }
-            }
+            const arrayBuffer = await file.arrayBuffer();
+            const orientation = getOrientation(arrayBuffer);
+            const fixedBlob = await fixImageOrientation(file, orientation);
+
+            uploadImage(fixedBlob, file.name);
           });
         }
+
+        async function uploadImage(file, fileName) {
+          try {
+            const formData = new FormData();
+            formData.append("profileImage", file, fileName);
+
+            const response = await axios.post(
+              `${API_URL}/user/upload/profile-image`,
+              formData,
+              {
+                headers: {
+                  Authorization: `Bearer ${document.cookie.replace(
+                    /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+                    "$1"
+                  )}`,
+                  "Content-Type": "multipart/form-data",
+                },
+              }
+            );
+
+            Swal.fire({
+              icon: "success",
+              title: "<%- __('successTitle')%>",
+              text: "<%- __('successProfileUpload')%>",
+            }).then(() => {
+              window.location.reload();
+            });
+          } catch (error) {
+            // Show error message
+            Swal.fire({
+              icon: "error",
+              title: "Error!",
+              text:
+                error.response?.data?.message ||
+                "<%- __('errorProfileUpload')%>",
+            });
+          }
+        }
+
+        function getOrientation(arrayBuffer) {
+          const view = new DataView(arrayBuffer);
+          if (view.getUint16(0, false) !== 0xffd8) return -2; // Not a JPEG file
+
+          let offset = 2;
+          let marker;
+
+          while (offset < view.byteLength) {
+            if (view.getUint16(offset) === 0xffe1) {
+              // APP1 marker
+              const length = view.getUint16(offset + 2);
+              const exifID = new TextDecoder().decode(
+                new Uint8Array(arrayBuffer, offset + 4, 4)
+              );
+
+              if (exifID !== "Exif") return -1; // Not an EXIF section
+
+              const littleEndian = view.getUint16(offset + 8) === 0x4949;
+              let tiffOffset = offset + 10;
+              let ifdOffset = view.getUint32(tiffOffset + 4, littleEndian);
+              let entries = view.getUint16(tiffOffset, littleEndian);
+
+              for (let i = 0; i < entries; i++) {
+                let entryOffset = tiffOffset + i * 12 + 2;
+                let tag = view.getUint16(entryOffset, littleEndian);
+
+                if (tag === 0x0112) {
+                  // Orientation tag
+                  return view.getUint16(entryOffset + 8, littleEndian);
+                }
+              }
+            }
+            offset += 2 + view.getUint16(offset);
+          }
+          return 1; // Default orientation (normal)
+        }
+
+        async function fixImageOrientation(file, orientation) {
+          return new Promise((resolve) => {
+            const img = new Image();
+            const url = URL.createObjectURL(file);
+
+            img.onload = function () {
+              const canvas = document.createElement("canvas");
+              const ctx = canvas.getContext("2d");
+
+              let { width, height } = img;
+              let rotate = 0;
+              let scaleX = 1,
+                scaleY = 1,
+                translateX = 0,
+                translateY = 0;
+
+              switch (orientation) {
+                case 2:
+                  scaleX = -1;
+                  translateX = -width;
+                  break;
+                case 3:
+                  translateX = -width;
+                  translateY = -height;
+                  rotate = Math.PI;
+                  break;
+                case 4:
+                  scaleY = -1;
+                  translateY = -height;
+                  break;
+                case 5:
+                  scaleX = -1;
+                  rotate = 0.5 * Math.PI;
+                  break;
+                case 6:
+                  canvas.width = height;
+                  canvas.height = width;
+                  rotate = 0.5 * Math.PI;
+                  translateX = 0;
+                  translateY = -height;
+                  break;
+                case 7:
+                  canvas.width = height;
+                  canvas.height = width;
+                  scaleX = -1;
+                  rotate = -0.5 * Math.PI;
+                  break;
+                case 8:
+                  canvas.width = height;
+                  canvas.height = width;
+                  translateX = -width;
+                  rotate = -0.5 * Math.PI;
+                  break;
+                default:
+                  canvas.width = width;
+                  canvas.height = height;
+              }
+
+              ctx.translate(canvas.width / 2, canvas.height / 2);
+              ctx.rotate(rotate);
+              ctx.scale(scaleX, scaleY);
+              ctx.drawImage(img, -width / 2, -height / 2);
+
+              canvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.9);
+            };
+
+            img.src = url;
+          });
+        }
+
         const deleteProfileImageButton =
           document.getElementById("deleteProfileImage");
 
