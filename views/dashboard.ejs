@@ -307,45 +307,54 @@
         }
 
         if (coverImageForm) {
-          // Handle file selection
-          coverImageInput.addEventListener("change", async () => {
-            if (coverImageInput.files && coverImageInput.files.length > 0) {
-              const formData = new FormData(coverImageForm);
-              try {
-                const response = await axios.post(
-                  `${API_URL}/user/upload/cover-image`,
-                  formData,
-                  {
-                    headers: {
-                      Authorization: `Bearer ${document.cookie.replace(
-                        /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
-                        "$1"
-                      )}`,
-                      "Content-Type": "multipart/form-data",
-                    },
-                  }
-                );
+          coverImageInput.addEventListener("change", async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
 
-                // Show success message and reload the page
-                Swal.fire({
-                  icon: "success",
-                  title: "<%- __('successTitle') %>",
-                  text: "<%- __('successCoverUpload') %>",
-                }).then(() => {
-                  window.location.reload();
-                });
-              } catch (error) {
-                // Show error message
-                Swal.fire({
-                  icon: "error",
-                  title: "<%- __('errorTitle') %>",
-                  text:
-                    error.response?.data?.message ||
-                    "<%- __('errorCoverUpload') %>",
-                });
-              }
-            }
+            const arrayBuffer = await file.arrayBuffer();
+            const orientation = getOrientation(arrayBuffer);
+            const fixedBlob = await fixImageOrientation(file, orientation);
+
+            uploadCoverImage(fixedBlob, file.name);
           });
+        }
+
+        async function uploadCoverImage(file, fileName) {
+          try {
+            const formData = new FormData();
+            formData.append("coverImage", file, fileName);
+
+            const response = await axios.post(
+              `${API_URL}/user/upload/cover-image`,
+              formData,
+              {
+                headers: {
+                  Authorization: `Bearer ${document.cookie.replace(
+                    /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+                    "$1"
+                  )}`,
+                  "Content-Type": "multipart/form-data",
+                },
+              }
+            );
+
+            Swal.fire({
+              icon: "success",
+              title: "<%- __('successTitle') %>",
+              text: "<%- __('successCoverUpload') %>",
+            }).then(() => {
+              window.location.reload();
+            });
+          } catch (error) {
+            // Show error message
+            Swal.fire({
+              icon: "error",
+              title: "<%- __('errorTitle') %>",
+              text:
+                error.response?.data?.message ||
+                "<%- __('errorCoverUpload') %>",
+            });
+          }
         }
 
         // change cover or delete cover dropdown
